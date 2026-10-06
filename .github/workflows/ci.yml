@@ -1,0 +1,43 @@
+name: Validate downstream application
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout downstream application
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify downstream policy guardrails
+        run: node scripts/verify-foundation.mjs
+
+      - name: Checkout pinned engine source
+        uses: actions/checkout@v4
+        with:
+          repository: neophilism/Secure-Intake-Case-Workflow-Engine
+          ref: 84362ad69ffd45a421d026c1c6a5ec0621a6b203
+          path: .engine
+
+      - name: Install pinned engine dependencies
+        working-directory: .engine
+        run: npm install
+
+      - name: Validate SIG manifest with pinned engine
+        working-directory: .engine
+        run: npm run app:manifest -- --file ../application/manifest.json --validate-only
+
+      - name: Validate Compose configuration
+        run: docker compose --env-file deployment/.env.example -f deployment/compose.yaml config
