@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sig}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sig-development-only}
+      POSTGRES_DB: ${POSTGRES_DB:-sig}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sig} -d ${POSTGRES_DB:-sig}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - sig_postgres:/var/lib/postgresql/data
+
+  engine:
+    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-sig}:${POSTGRES_PASSWORD:-sig-development-only}@postgres:5432/${POSTGRES_DB:-sig}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
+      AUTH_SESSION_COOKIE_NAME: ${AUTH_SESSION_COOKIE_NAME:-sig_session}
+      AUTH_LOGIN_FAILURE_LIMIT: ${AUTH_LOGIN_FAILURE_LIMIT:-5}
+      AUTH_LOGIN_WINDOW_MINUTES: ${AUTH_LOGIN_WINDOW_MINUTES:-15}
+      AUTH_LOGIN_BLOCK_MINUTES: ${AUTH_LOGIN_BLOCK_MINUTES:-15}
+      AUTH_TRUST_PROXY_HEADERS: ${AUTH_TRUST_PROXY_HEADERS:-false}
+      WEBHOOK_ENCRYPTION_KEY: ${WEBHOOK_ENCRYPTION_KEY:-}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-admin@sig.local}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      BOOTSTRAP_ORGANIZATION_NAME: Secure Innovation Gateway
+      BOOTSTRAP_ORGANIZATION_SLUG: secure-innovation-gateway
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    volumes:
+      - ../application:/application:ro
+
+  worker:
+    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.1}
+    command: ["npm", "run", "worker"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-sig}:${POSTGRES_PASSWORD:-sig-development-only}@postgres:5432/${POSTGRES_DB:-sig}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
+      AUTH_SESSION_COOKIE_NAME: ${AUTH_SESSION_COOKIE_NAME:-sig_session}
+      WEBHOOK_ENCRYPTION_KEY: ${WEBHOOK_ENCRYPTION_KEY:-}
+
+volumes:
+  sig_postgres:
