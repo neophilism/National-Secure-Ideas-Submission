@@ -10,19 +10,33 @@
 - validate the manifest against the pinned upstream parser in CI;
 - document capability gaps discovered by the first real downstream implementation.
 
-## PR 2 — Protected submitter architecture
+## PR 2 — Protected submitter identity
 
-Before collecting confidential identities, implement the reusable upstream capability needed for:
+Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 22.
 
-- content/identity compartment separation;
-- separate authorization;
-- immutable identity-access audit;
-- two-person identity reveal approval;
-- pseudonymous external credential/status/message access.
+- update the engine pin to `1.0.0-rc.2`;
+- enable source-defined fully anonymous, confidential/pseudonymous, and open-with-consent modes;
+- keep identifying/contact values in the encrypted `submitter_identity` compartment;
+- separate identity-request and identity-approval roles;
+- enforce engine-level dual control, one-time reveal, and immutable identity-access audit;
+- add the source-defined submitter eligibility attestation;
+- preserve the unclassified-only public intake boundary.
 
-Once released upstream, update this repository's engine pin and enable confidential/pseudonymous and open-with-consent identity modes.
+PR 2 deliberately does **not** claim that the protected external participant portal exists.
 
-## PR 3 — Public supporting evidence
+## PR 3 — Protected participant status and messaging
+
+Implement the remaining reusable upstream participant capability, then consume it here:
+
+- high-entropy external tracking credential;
+- protected public status lookup;
+- secure two-way submitter messaging;
+- additional-information requests without sensitive email content;
+- credential rotation/revocation/recovery policy;
+- account-based option with strong authentication where appropriate;
+- fully anonymous mode remains usable without contact.
+
+## PR 4 — Public supporting evidence
 
 Add the reusable public attachment pipeline:
 
@@ -33,7 +47,7 @@ Add the reusable public attachment pipeline:
 - promotion into the case file only after clean status;
 - public UX for technical drawings/supporting documents.
 
-## PR 4 — Referral ledger and agency accountability
+## PR 5 — Referral ledger and agency accountability
 
 If implemented upstream as a reusable primitive, add first-class agency referral work items so one SIG case can:
 
@@ -43,18 +57,19 @@ If implemented upstream as a reusable primitive, add first-class agency referral
 - record extensions and response history;
 - escalate per-agency non-compliance.
 
-## PR 5 — Operational SIG experience
+## PR 6 — Operational SIG experience
 
 - staff queue tuning;
 - triage/panel/referral dashboard views;
 - submitter-safe communication templates;
 - IP-interest handling workflow;
 - closure and feedback UX;
-- aggregate performance metrics mapped to SIG KPIs.
+- aggregate performance metrics mapped to SIG KPIs;
+- approved identity-verification integration points if required for deployment.
 
-## PR 6 — Security/deployment acceptance
+## PR 7 — Security/deployment acceptance
 
-- production secret handling;
+- production secret handling and key custody;
 - IdP/MFA integration plan;
 - network and egress controls;
 - storage/backup policy;
