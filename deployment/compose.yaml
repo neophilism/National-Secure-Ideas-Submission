@@ -14,7 +14,7 @@ services:
       - sig_postgres:/var/lib/postgresql/data
 
   engine:
-    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.1}
+    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.2}
     depends_on:
       postgres:
         condition: service_healthy
@@ -27,6 +27,7 @@ services:
       AUTH_LOGIN_BLOCK_MINUTES: ${AUTH_LOGIN_BLOCK_MINUTES:-15}
       AUTH_TRUST_PROXY_HEADERS: ${AUTH_TRUST_PROXY_HEADERS:-false}
       WEBHOOK_ENCRYPTION_KEY: ${WEBHOOK_ENCRYPTION_KEY:-}
+      PROTECTED_DATA_ENCRYPTION_KEY: ${PROTECTED_DATA_ENCRYPTION_KEY:-}
       BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-admin@sig.local}
       BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
       BOOTSTRAP_ORGANIZATION_NAME: Secure Innovation Gateway
@@ -37,7 +38,7 @@ services:
       - ../application:/application:ro
 
   worker:
-    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.1}
+    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.2}
     command: ["npm", "run", "worker"]
     depends_on:
       postgres:
@@ -47,6 +48,7 @@ services:
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
       AUTH_SESSION_COOKIE_NAME: ${AUTH_SESSION_COOKIE_NAME:-sig_session}
       WEBHOOK_ENCRYPTION_KEY: ${WEBHOOK_ENCRYPTION_KEY:-}
+      PROTECTED_DATA_ENCRYPTION_KEY: ${PROTECTED_DATA_ENCRYPTION_KEY:-}
 
 volumes:
   sig_postgres:
