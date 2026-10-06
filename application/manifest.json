@@ -994,6 +994,13 @@
                 "attestationText": "I understand that this web form is not an approved channel for classified information, and I will not submit classified information through it."
               },
               {
+                "id": "submitter_eligibility_attestation",
+                "type": "attestation",
+                "label": "Submitter eligibility attestation",
+                "required": true,
+                "attestationText": "I am a United States citizen or lawful permanent resident, or I am submitting on behalf of an entity substantially owned by United States citizens or lawful permanent residents."
+              },
+              {
                 "id": "good_faith_attestation",
                 "type": "attestation",
                 "label": "Good-faith attestation",
