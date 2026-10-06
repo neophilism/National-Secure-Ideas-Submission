@@ -1,0 +1,1483 @@
+{
+  "schemaVersion": 1,
+  "application": {
+    "key": "secure_innovation_gateway",
+    "name": "Secure Innovation Gateway",
+    "shortName": "SIG",
+    "description": "Application configuration for receiving, triaging, evaluating, referring, and tracking unclassified national-security-relevant submissions under the National Secure Ideas Submission Act of 2025.",
+    "branding": {
+      "accentColor": "#17365D",
+      "homeTitle": "American Innovation Shield",
+      "homeDescription": "Submit an unclassified national-security-relevant idea, innovation, vulnerability report, operational insight, or report of wrongdoing for SIG review. Do not submit classified information through this ordinary web form."
+    },
+    "terminology": {
+      "case": {
+        "singular": "SIG Case",
+        "plural": "SIG Cases"
+      },
+      "submission": {
+        "singular": "Submission",
+        "plural": "Submissions"
+      },
+      "submitter": {
+        "singular": "Submitter",
+        "plural": "Submitters"
+      },
+      "review": {
+        "singular": "Review",
+        "plural": "Reviews"
+      },
+      "deadline": {
+        "singular": "Response Deadline",
+        "plural": "Response Deadlines"
+      },
+      "document": {
+        "singular": "Case Document",
+        "plural": "Case Documents"
+      },
+      "queue": {
+        "singular": "Work Queue",
+        "plural": "Work Queues"
+      }
+    }
+  },
+  "roles": [
+    {
+      "key": "sig_triage_officer",
+      "name": "SIG Triage Officer",
+      "description": "Screens incoming submissions, identifies urgency and scope, records triage context, and routes substantive matters for expert review.",
+      "permissions": [
+        "submission:view",
+        "case:create",
+        "case:view",
+        "case:assign",
+        "case:update",
+        "deadline:view",
+        "deadline:operate",
+        "document:view",
+        "document:upload",
+        "document:view_private",
+        "note:view",
+        "note:create_internal",
+        "correspondence:view",
+        "correspondence:manage",
+        "notification:view",
+        "routing:view"
+      ]
+    },
+    {
+      "key": "sig_expert_reviewer",
+      "name": "SIG Expert Reviewer",
+      "description": "Evaluates substantive submissions for merit, urgency, relevance, requests for additional information, and referral recommendations.",
+      "permissions": [
+        "submission:view",
+        "case:view",
+        "case:update",
+        "deadline:view",
+        "deadline:operate",
+        "document:view",
+        "document:upload",
+        "document:view_private",
+        "note:view",
+        "note:create_internal",
+        "correspondence:view",
+        "notification:view",
+        "routing:view"
+      ]
+    },
+    {
+      "key": "sig_case_officer",
+      "name": "SIG Case Officer",
+      "description": "Coordinates referral packages, submitter communications, agency follow-up, and closure for referred matters.",
+      "permissions": [
+        "submission:view",
+        "case:view",
+        "case:assign",
+        "case:update",
+        "case:close",
+        "deadline:view",
+        "deadline:operate",
+        "document:view",
+        "document:upload",
+        "document:view_private",
+        "note:view",
+        "note:create_internal",
+        "note:create_participant",
+        "correspondence:view",
+        "correspondence:manage",
+        "notification:view",
+        "routing:view"
+      ]
+    },
+    {
+      "key": "sig_agency_liaison",
+      "name": "SIG Agency Liaison",
+      "description": "Tracks participating-agency acknowledgments, preliminary assessments, action plans, and final status updates.",
+      "permissions": [
+        "case:view",
+        "case:update",
+        "deadline:view",
+        "deadline:operate",
+        "document:view",
+        "document:upload",
+        "document:view_private",
+        "note:view",
+        "note:create_internal",
+        "correspondence:view",
+        "correspondence:manage",
+        "notification:view"
+      ]
+    },
+    {
+      "key": "sig_supervisor",
+      "name": "SIG Supervisor",
+      "description": "Supervises intake, expert-review, referral, deadline, assignment, and closure operations.",
+      "permissions": [
+        "submission:view",
+        "case:create",
+        "case:view",
+        "case:assign",
+        "case:update",
+        "case:close",
+        "deadline:view",
+        "deadline:operate",
+        "deadline:manage",
+        "document:view",
+        "document:upload",
+        "document:manage",
+        "document:view_private",
+        "note:view",
+        "note:create_internal",
+        "note:create_participant",
+        "correspondence:view",
+        "correspondence:manage",
+        "notification:view",
+        "notification:manage",
+        "routing:view",
+        "routing:manage",
+        "audit:view"
+      ]
+    },
+    {
+      "key": "sig_oversight_auditor",
+      "name": "SIG Oversight Auditor",
+      "description": "Read-only oversight role for reviewing submission handling, deadlines, access history, correspondence, and audit events.",
+      "permissions": [
+        "organization:view",
+        "form:view",
+        "workflow:view",
+        "routing:view",
+        "submission:view",
+        "case:view",
+        "deadline:view",
+        "document:view",
+        "document:view_private",
+        "note:view",
+        "correspondence:view",
+        "notification:view",
+        "audit:view",
+        "application:view"
+      ]
+    }
+  ],
+  "documentTypes": [
+    {
+      "key": "submission_supporting_material",
+      "name": "Submission Supporting Material",
+      "description": "Unclassified supporting material associated with a submission. Public upload is not enabled in the foundation release.",
+      "acceptedMimeTypes": [
+        "application/pdf",
+        "text/plain",
+        "image/png",
+        "image/jpeg",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ],
+      "maxBytes": 52428800
+    },
+    {
+      "key": "expert_panel_assessment",
+      "name": "Expert Panel Assessment",
+      "acceptedMimeTypes": [
+        "application/pdf",
+        "text/plain"
+      ],
+      "maxBytes": 26214400
+    },
+    {
+      "key": "agency_referral_package",
+      "name": "Agency Referral Package",
+      "acceptedMimeTypes": [
+        "application/pdf"
+      ],
+      "maxBytes": 52428800
+    },
+    {
+      "key": "agency_response",
+      "name": "Agency Response",
+      "acceptedMimeTypes": [
+        "application/pdf",
+        "text/plain"
+      ],
+      "maxBytes": 52428800
+    },
+    {
+      "key": "intellectual_property_record",
+      "name": "Intellectual Property Record",
+      "description": "Record concerning patent, trade-secret, licensing, credit, or compensation interests associated with a submission.",
+      "acceptedMimeTypes": [
+        "application/pdf",
+        "text/plain"
+      ],
+      "maxBytes": 26214400
+    }
+  ],
+  "deadlineCalendars": [
+    {
+      "key": "sig_business_calendar",
+      "name": "SIG Business Calendar",
+      "timeZone": "America/New_York",
+      "weekendDays": [
+        0,
+        6
+      ]
+    }
+  ],
+  "teams": [
+    {
+      "slug": "triage_team",
+      "name": "Intake and Triage Team"
+    },
+    {
+      "slug": "urgent_duty_team",
+      "name": "Urgent Duty Team"
+    },
+    {
+      "slug": "defense_technology_panel",
+      "name": "Defense Technology Panel"
+    },
+    {
+      "slug": "cybersecurity_panel",
+      "name": "Cybersecurity Panel"
+    },
+    {
+      "slug": "intelligence_foreign_threats_panel",
+      "name": "Intelligence and Foreign Threats Panel"
+    },
+    {
+      "slug": "homeland_law_enforcement_panel",
+      "name": "Homeland Security and Law Enforcement Panel"
+    },
+    {
+      "slug": "science_technology_panel",
+      "name": "Science and Technology Innovations Panel"
+    },
+    {
+      "slug": "policy_governance_panel",
+      "name": "Policy and Governance Panel"
+    },
+    {
+      "slug": "general_multidomain_panel",
+      "name": "General and Multidomain Panel"
+    },
+    {
+      "slug": "referral_coordination_team",
+      "name": "Referral Coordination Team"
+    },
+    {
+      "slug": "agency_followup_team",
+      "name": "Agency Follow-up Team"
+    },
+    {
+      "slug": "oversight_compliance_team",
+      "name": "Oversight and Compliance Team"
+    }
+  ],
+  "queues": [
+    {
+      "slug": "intake_triage",
+      "name": "Intake and Triage",
+      "teamSlug": "triage_team",
+      "assignmentStrategy": "round_robin"
+    },
+    {
+      "slug": "urgent_duty",
+      "name": "Urgent Duty",
+      "teamSlug": "urgent_duty_team",
+      "assignmentStrategy": "manual"
+    },
+    {
+      "slug": "defense_technology_review",
+      "name": "Defense Technology Review",
+      "teamSlug": "defense_technology_panel",
+      "assignmentStrategy": "round_robin"
+    },
+    {
+      "slug": "cybersecurity_review",
+      "name": "Cybersecurity Review",
+      "teamSlug": "cybersecurity_panel",
+      "assignmentStrategy": "round_robin"
+    },
+    {
+      "slug": "intelligence_foreign_threats_review",
+      "name": "Intelligence and Foreign Threats Review",
+      "teamSlug": "intelligence_foreign_threats_panel",
+      "assignmentStrategy": "round_robin"
+    },
+    {
+      "slug": "homeland_law_enforcement_review",
+      "name": "Homeland Security and Law Enforcement Review",
+      "teamSlug": "homeland_law_enforcement_panel",
+      "assignmentStrategy": "round_robin"
+    },
+    {
+      "slug": "science_technology_review",
+      "name": "Science and Technology Innovations Review",
+      "teamSlug": "science_technology_panel",
+      "assignmentStrategy": "round_robin"
+    },
+    {
+      "slug": "policy_governance_review",
+      "name": "Policy and Governance Review",
+      "teamSlug": "policy_governance_panel",
+      "assignmentStrategy": "round_robin"
+    },
+    {
+      "slug": "general_multidomain_review",
+      "name": "General and Multidomain Review",
+      "teamSlug": "general_multidomain_panel",
+      "assignmentStrategy": "round_robin"
+    },
+    {
+      "slug": "referral_coordination",
+      "name": "Referral Coordination",
+      "teamSlug": "referral_coordination_team",
+      "assignmentStrategy": "round_robin"
+    },
+    {
+      "slug": "agency_followup",
+      "name": "Agency Follow-up",
+      "teamSlug": "agency_followup_team",
+      "assignmentStrategy": "round_robin"
+    },
+    {
+      "slug": "oversight_compliance",
+      "name": "Overdue / Compliance Escalation",
+      "teamSlug": "oversight_compliance_team",
+      "assignmentStrategy": "manual"
+    }
+  ],
+  "communicationTemplates": [
+    {
+      "key": "submission_acknowledgment",
+      "name": "Submission Acknowledgment",
+      "channel": "portal",
+      "subjectTemplate": "SIG submission {{case_number}} received",
+      "bodyTemplate": "Your submission has been received and assigned tracking number {{case_number}}. SIG will review it and update the status when a protected submitter communication channel is available.",
+      "defaultVisibility": "participant"
+    },
+    {
+      "key": "additional_information_request",
+      "name": "Additional Information Request",
+      "channel": "portal",
+      "subjectTemplate": "Additional information requested for {{case_number}}",
+      "bodyTemplate": "SIG reviewers need additional information concerning {{case_number}}. Please use the protected SIG communication channel to respond.",
+      "defaultVisibility": "participant"
+    },
+    {
+      "key": "agency_referral_notice",
+      "name": "Agency Referral Notice",
+      "channel": "portal",
+      "subjectTemplate": "Status update for {{case_number}}",
+      "bodyTemplate": "SIG has referred {{case_number}} to an appropriate participating agency for evaluation. SIG remains the point of contact for this submission.",
+      "defaultVisibility": "participant"
+    },
+    {
+      "key": "agency_preliminary_update",
+      "name": "Agency Preliminary Update",
+      "channel": "portal",
+      "subjectTemplate": "Agency update for {{case_number}}",
+      "bodyTemplate": "SIG has received a preliminary agency assessment or action plan for {{case_number}}. Any releasable status information will be provided through the protected portal.",
+      "defaultVisibility": "participant"
+    },
+    {
+      "key": "closure_notice",
+      "name": "Closure Notice",
+      "channel": "portal",
+      "subjectTemplate": "SIG case {{case_number}} closed",
+      "bodyTemplate": "SIG case {{case_number}} has been closed with status {{case_status}}. Any releasable outcome information is available through the protected portal.",
+      "defaultVisibility": "participant"
+    }
+  ],
+  "workflows": [
+    {
+      "slug": "sig_submission_workflow",
+      "name": "SIG Submission Lifecycle",
+      "description": "Unclassified submission lifecycle from receipt through triage, expert review, referral, agency response tracking, resolution, and closure.",
+      "definition": {
+        "schemaVersion": 1,
+        "initialState": "received",
+        "states": [
+          {
+            "key": "received",
+            "label": "Received"
+          },
+          {
+            "key": "triage",
+            "label": "Triage"
+          },
+          {
+            "key": "urgent_review",
+            "label": "Urgent Review"
+          },
+          {
+            "key": "expert_review",
+            "label": "Expert Panel Review"
+          },
+          {
+            "key": "pending_submitter_information",
+            "label": "Pending Submitter Information"
+          },
+          {
+            "key": "referral_preparation",
+            "label": "Referral Preparation"
+          },
+          {
+            "key": "referred_to_agency",
+            "label": "Referred to Agency"
+          },
+          {
+            "key": "agency_preliminary_response",
+            "label": "Agency Preliminary Response Received"
+          },
+          {
+            "key": "agency_follow_up",
+            "label": "Agency Follow-up"
+          },
+          {
+            "key": "resolved",
+            "label": "Resolved"
+          },
+          {
+            "key": "closed_nongermane",
+            "label": "Closed – Non-germane"
+          },
+          {
+            "key": "closed_no_action",
+            "label": "Closed – No Further Action"
+          },
+          {
+            "key": "closed_duplicate",
+            "label": "Closed – Duplicate / Merged"
+          },
+          {
+            "key": "closed_resolved",
+            "label": "Closed – Resolved"
+          }
+        ],
+        "transitions": [
+          {
+            "key": "begin_triage",
+            "label": "Begin Triage",
+            "from": "received",
+            "to": "triage",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "optional",
+            "actions": [
+              {
+                "type": "mark_open"
+              }
+            ]
+          },
+          {
+            "key": "close_nongermane",
+            "label": "Close as Non-germane",
+            "from": "triage",
+            "to": "closed_nongermane",
+            "requiredPermissions": [
+              "case:close"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "set_disposition",
+                "value": "Closed – Non-germane"
+              },
+              {
+                "type": "mark_closed"
+              }
+            ]
+          },
+          {
+            "key": "escalate_urgent",
+            "label": "Escalate as Urgent",
+            "from": "triage",
+            "to": "urgent_review",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "set_priority",
+                "value": "urgent"
+              },
+              {
+                "type": "add_tag",
+                "value": "urgent"
+              }
+            ]
+          },
+          {
+            "key": "route_to_panel",
+            "label": "Route to Expert Panel",
+            "from": "triage",
+            "to": "expert_review",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "add_tag",
+                "value": "expert_review"
+              }
+            ]
+          },
+          {
+            "key": "urgent_refer_to_agency",
+            "label": "Urgent Referral to Agency",
+            "from": "urgent_review",
+            "to": "referred_to_agency",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "add_tag",
+                "value": "urgent_referral"
+              },
+              {
+                "type": "mark_open"
+              }
+            ]
+          },
+          {
+            "key": "panel_request_more_information",
+            "label": "Request More Information",
+            "from": "expert_review",
+            "to": "pending_submitter_information",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required"
+          },
+          {
+            "key": "resume_panel_review",
+            "label": "Resume Expert Review",
+            "from": "pending_submitter_information",
+            "to": "expert_review",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "optional"
+          },
+          {
+            "key": "prepare_positive_referral",
+            "label": "Prepare Positive Referral",
+            "from": "expert_review",
+            "to": "referral_preparation",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "add_tag",
+                "value": "positive_recommendation"
+              }
+            ]
+          },
+          {
+            "key": "prepare_awareness_referral",
+            "label": "Prepare Awareness / Verification Referral",
+            "from": "expert_review",
+            "to": "referral_preparation",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "add_tag",
+                "value": "awareness_referral"
+              }
+            ]
+          },
+          {
+            "key": "close_no_action",
+            "label": "Close – No Further Action",
+            "from": "expert_review",
+            "to": "closed_no_action",
+            "requiredPermissions": [
+              "case:close"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "set_disposition",
+                "value": "Closed – No further action"
+              },
+              {
+                "type": "mark_closed"
+              }
+            ]
+          },
+          {
+            "key": "close_duplicate",
+            "label": "Close – Duplicate / Merged",
+            "from": "expert_review",
+            "to": "closed_duplicate",
+            "requiredPermissions": [
+              "case:close"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "set_disposition",
+                "value": "Closed – Duplicate or merged with related submission"
+              },
+              {
+                "type": "mark_closed"
+              }
+            ]
+          },
+          {
+            "key": "refer_to_agency",
+            "label": "Refer to Participating Agency",
+            "from": "referral_preparation",
+            "to": "referred_to_agency",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required",
+            "guards": {
+              "requiredCaseFields": [
+                "summary"
+              ],
+              "requiredSubmissionFields": [
+                "submission_kind",
+                "primary_domain",
+                "national_security_relevance"
+              ],
+              "requiredDocuments": []
+            },
+            "actions": [
+              {
+                "type": "add_tag",
+                "value": "agency_referred"
+              }
+            ]
+          },
+          {
+            "key": "record_preliminary_agency_response",
+            "label": "Record Preliminary Agency Response",
+            "from": "referred_to_agency",
+            "to": "agency_preliminary_response",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required"
+          },
+          {
+            "key": "continue_agency_follow_up",
+            "label": "Continue Agency Follow-up",
+            "from": "agency_preliminary_response",
+            "to": "agency_follow_up",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "optional"
+          },
+          {
+            "key": "resolve_from_preliminary",
+            "label": "Resolve from Preliminary Response",
+            "from": "agency_preliminary_response",
+            "to": "resolved",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "mark_resolved"
+              }
+            ]
+          },
+          {
+            "key": "record_final_agency_status",
+            "label": "Record Final Agency Status",
+            "from": "agency_follow_up",
+            "to": "resolved",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "mark_resolved"
+              }
+            ]
+          },
+          {
+            "key": "close_resolved",
+            "label": "Close Resolved Case",
+            "from": "resolved",
+            "to": "closed_resolved",
+            "requiredPermissions": [
+              "case:close"
+            ],
+            "comment": "required",
+            "actions": [
+              {
+                "type": "mark_closed"
+              }
+            ]
+          }
+        ],
+        "deadlinePolicies": [
+          {
+            "key": "triage_target",
+            "label": "Triage Target",
+            "description": "Operational target to complete initial triage within 3 working days of receipt.",
+            "trigger": {
+              "type": "case_created"
+            },
+            "duration": {
+              "value": 3,
+              "unit": "business_days"
+            },
+            "warningBefore": {
+              "value": 1,
+              "unit": "business_days"
+            },
+            "calendarKey": "sig_business_calendar",
+            "completeOnTransitions": [
+              "close_nongermane",
+              "escalate_urgent",
+              "route_to_panel"
+            ],
+            "escalation": {
+              "priority": "high",
+              "queueSlug": "oversight_compliance"
+            }
+          },
+          {
+            "key": "initial_panel_review_target",
+            "label": "Initial Expert Review Target",
+            "description": "Operational target for the expert panel's initial review and recommendation.",
+            "trigger": {
+              "type": "transition",
+              "transitionKey": "route_to_panel"
+            },
+            "duration": {
+              "value": 10,
+              "unit": "business_days"
+            },
+            "warningBefore": {
+              "value": 2,
+              "unit": "business_days"
+            },
+            "calendarKey": "sig_business_calendar",
+            "completeOnTransitions": [
+              "panel_request_more_information",
+              "prepare_positive_referral",
+              "prepare_awareness_referral",
+              "close_no_action",
+              "close_duplicate"
+            ],
+            "escalation": {
+              "priority": "high",
+              "queueSlug": "oversight_compliance"
+            }
+          },
+          {
+            "key": "resumed_panel_review_target",
+            "label": "Resumed Expert Review Target",
+            "trigger": {
+              "type": "transition",
+              "transitionKey": "resume_panel_review"
+            },
+            "duration": {
+              "value": 10,
+              "unit": "business_days"
+            },
+            "warningBefore": {
+              "value": 2,
+              "unit": "business_days"
+            },
+            "calendarKey": "sig_business_calendar",
+            "completeOnTransitions": [
+              "panel_request_more_information",
+              "prepare_positive_referral",
+              "prepare_awareness_referral",
+              "close_no_action",
+              "close_duplicate"
+            ],
+            "escalation": {
+              "priority": "high",
+              "queueSlug": "oversight_compliance"
+            }
+          },
+          {
+            "key": "agency_preliminary_response",
+            "label": "Agency Preliminary Response",
+            "description": "Participating agency preliminary assessment or action plan due within 30 days of routine referral.",
+            "trigger": {
+              "type": "transition",
+              "transitionKey": "refer_to_agency"
+            },
+            "duration": {
+              "value": 30,
+              "unit": "calendar_days"
+            },
+            "warningBefore": {
+              "value": 5,
+              "unit": "calendar_days"
+            },
+            "completeOnTransitions": [
+              "record_preliminary_agency_response"
+            ],
+            "escalation": {
+              "priority": "high",
+              "queueSlug": "oversight_compliance"
+            }
+          },
+          {
+            "key": "urgent_agency_preliminary_response",
+            "label": "Urgent Agency Preliminary Response",
+            "description": "Urgent-threat preliminary response target.",
+            "trigger": {
+              "type": "transition",
+              "transitionKey": "urgent_refer_to_agency"
+            },
+            "duration": {
+              "value": 72,
+              "unit": "hours"
+            },
+            "warningBefore": {
+              "value": 24,
+              "unit": "hours"
+            },
+            "completeOnTransitions": [
+              "record_preliminary_agency_response"
+            ],
+            "escalation": {
+              "priority": "urgent",
+              "queueSlug": "oversight_compliance"
+            }
+          },
+          {
+            "key": "agency_final_status",
+            "label": "Agency Final Disposition or Status",
+            "description": "Final disposition or substantive status update expected within 90 days of routine referral, subject to agreed extension for complex matters.",
+            "trigger": {
+              "type": "transition",
+              "transitionKey": "refer_to_agency"
+            },
+            "duration": {
+              "value": 90,
+              "unit": "calendar_days"
+            },
+            "warningBefore": {
+              "value": 15,
+              "unit": "calendar_days"
+            },
+            "pausable": true,
+            "completeOnTransitions": [
+              "resolve_from_preliminary",
+              "record_final_agency_status"
+            ],
+            "escalation": {
+              "priority": "high",
+              "queueSlug": "oversight_compliance"
+            }
+          },
+          {
+            "key": "urgent_agency_final_status",
+            "label": "Urgent Agency Final Disposition or Status",
+            "trigger": {
+              "type": "transition",
+              "transitionKey": "urgent_refer_to_agency"
+            },
+            "duration": {
+              "value": 90,
+              "unit": "calendar_days"
+            },
+            "warningBefore": {
+              "value": 15,
+              "unit": "calendar_days"
+            },
+            "pausable": true,
+            "completeOnTransitions": [
+              "resolve_from_preliminary",
+              "record_final_agency_status"
+            ],
+            "escalation": {
+              "priority": "high",
+              "queueSlug": "oversight_compliance"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "forms": [
+    {
+      "slug": "secure-idea-submission",
+      "name": "Secure Innovation Gateway Submission",
+      "description": "Foundation unclassified intake for anonymous national-security-relevant submissions. Protected identity/contact intake and public attachments are intentionally deferred until the required controls are available.",
+      "accessMode": "public",
+      "workflowSlug": "sig_submission_workflow",
+      "definition": {
+        "schemaVersion": 1,
+        "intro": "Use this form only for unclassified information. This foundation release accepts anonymous content submissions and does not collect identifying/contact information. Do not include classified information. If information is or may be classified, use an approved secure channel designated by SIG.",
+        "submitLabel": "Submit to SIG",
+        "confirmationMessage": "Your unclassified submission has been received. Save the confirmation information shown by the system. Protected submitter status and messaging are not yet enabled in this foundation release.",
+        "sections": [
+          {
+            "id": "security_notice",
+            "title": "Security Notice",
+            "description": "The ordinary web intake is not an approved classified-information channel.",
+            "fields": [
+              {
+                "id": "unclassified_attestation",
+                "type": "attestation",
+                "label": "Unclassified-information attestation",
+                "required": true,
+                "attestationText": "I understand that this web form is not an approved channel for classified information, and I will not submit classified information through it."
+              },
+              {
+                "id": "good_faith_attestation",
+                "type": "attestation",
+                "label": "Good-faith attestation",
+                "required": true,
+                "attestationText": "I am submitting in good faith and believe the information may be relevant to United States national security or public safety."
+              }
+            ]
+          },
+          {
+            "id": "submission",
+            "title": "Submission",
+            "description": "Describe the idea, innovation, vulnerability, operational insight, policy issue, or wrongdoing report you want SIG to evaluate.",
+            "fields": [
+              {
+                "id": "submission_kind",
+                "type": "select",
+                "label": "Type of submission",
+                "required": true,
+                "options": [
+                  {
+                    "value": "technology_innovation",
+                    "label": "Technology or invention"
+                  },
+                  {
+                    "value": "security_vulnerability",
+                    "label": "Security vulnerability"
+                  },
+                  {
+                    "value": "wrongdoing_negligence",
+                    "label": "Wrongdoing or negligence"
+                  },
+                  {
+                    "value": "operational_insight",
+                    "label": "Operational insight"
+                  },
+                  {
+                    "value": "policy_governance",
+                    "label": "Policy or governance suggestion"
+                  },
+                  {
+                    "value": "other",
+                    "label": "Other national-security-relevant information"
+                  }
+                ]
+              },
+              {
+                "id": "primary_domain",
+                "type": "select",
+                "label": "Primary national security domain",
+                "required": true,
+                "options": [
+                  {
+                    "value": "defense_technology",
+                    "label": "Defense Technology"
+                  },
+                  {
+                    "value": "cybersecurity",
+                    "label": "Cybersecurity"
+                  },
+                  {
+                    "value": "intelligence_foreign_threats",
+                    "label": "Intelligence & Foreign Threats"
+                  },
+                  {
+                    "value": "homeland_law_enforcement",
+                    "label": "Homeland Security & Law Enforcement"
+                  },
+                  {
+                    "value": "science_technology",
+                    "label": "Science & Technology Innovations"
+                  },
+                  {
+                    "value": "policy_governance",
+                    "label": "Policy & Governance"
+                  },
+                  {
+                    "value": "other_multidomain",
+                    "label": "Other / Multidomain"
+                  }
+                ]
+              },
+              {
+                "id": "secondary_domains",
+                "type": "multiselect",
+                "label": "Additional relevant domains (optional)",
+                "required": false,
+                "options": [
+                  {
+                    "value": "defense_technology",
+                    "label": "Defense Technology"
+                  },
+                  {
+                    "value": "cybersecurity",
+                    "label": "Cybersecurity"
+                  },
+                  {
+                    "value": "intelligence_foreign_threats",
+                    "label": "Intelligence & Foreign Threats"
+                  },
+                  {
+                    "value": "homeland_law_enforcement",
+                    "label": "Homeland Security & Law Enforcement"
+                  },
+                  {
+                    "value": "science_technology",
+                    "label": "Science & Technology Innovations"
+                  },
+                  {
+                    "value": "policy_governance",
+                    "label": "Policy & Governance"
+                  }
+                ]
+              },
+              {
+                "id": "submission_title",
+                "type": "short_text",
+                "label": "Short title",
+                "required": true,
+                "validation": {
+                  "minLength": 5,
+                  "maxLength": 200
+                }
+              },
+              {
+                "id": "summary",
+                "type": "long_text",
+                "label": "Summary",
+                "required": true,
+                "helpText": "Summarize the core idea, issue, or warning.",
+                "validation": {
+                  "minLength": 25,
+                  "maxLength": 3000
+                }
+              },
+              {
+                "id": "detailed_description",
+                "type": "long_text",
+                "label": "Detailed description",
+                "required": true,
+                "helpText": "Provide the technical, operational, factual, or policy detail needed for initial evaluation. Do not include classified information.",
+                "validation": {
+                  "minLength": 50,
+                  "maxLength": 20000
+                }
+              },
+              {
+                "id": "national_security_relevance",
+                "type": "long_text",
+                "label": "Why is this relevant to national security or public safety?",
+                "required": true,
+                "validation": {
+                  "minLength": 20,
+                  "maxLength": 5000
+                }
+              }
+            ]
+          },
+          {
+            "id": "urgency",
+            "title": "Urgency",
+            "fields": [
+              {
+                "id": "urgency",
+                "type": "select",
+                "label": "How urgent is this submission?",
+                "required": true,
+                "options": [
+                  {
+                    "value": "routine",
+                    "label": "Routine"
+                  },
+                  {
+                    "value": "time_sensitive",
+                    "label": "Time-sensitive"
+                  },
+                  {
+                    "value": "immediate",
+                    "label": "Immediate threat or critical vulnerability"
+                  }
+                ]
+              },
+              {
+                "id": "urgency_details",
+                "type": "long_text",
+                "label": "Explain the immediate urgency",
+                "required": true,
+                "condition": {
+                  "fieldId": "urgency",
+                  "operator": "equals",
+                  "value": "immediate"
+                },
+                "validation": {
+                  "minLength": 20,
+                  "maxLength": 5000
+                }
+              }
+            ]
+          },
+          {
+            "id": "intellectual_property",
+            "title": "Intellectual Property and Proprietary Interests",
+            "description": "The source proposal contemplates preserving patent, trade-secret, licensing, credit, and compensation interests. This field helps reviewers identify matters that may require specialized handling.",
+            "fields": [
+              {
+                "id": "ip_interest",
+                "type": "select",
+                "label": "Does the submission involve intellectual-property or proprietary interests?",
+                "required": true,
+                "options": [
+                  {
+                    "value": "none",
+                    "label": "No known IP or proprietary interest"
+                  },
+                  {
+                    "value": "patent_invention",
+                    "label": "Patent or invention interest"
+                  },
+                  {
+                    "value": "trade_secret",
+                    "label": "Trade secret"
+                  },
+                  {
+                    "value": "other_proprietary",
+                    "label": "Other proprietary information"
+                  }
+                ]
+              },
+              {
+                "id": "ip_notes",
+                "type": "long_text",
+                "label": "Describe the IP or proprietary interest",
+                "required": true,
+                "condition": {
+                  "fieldId": "ip_interest",
+                  "operator": "not_equals",
+                  "value": "none"
+                },
+                "validation": {
+                  "minLength": 10,
+                  "maxLength": 5000
+                }
+              }
+            ]
+          },
+          {
+            "id": "foundation_privacy_notice",
+            "title": "Foundation Privacy Limitation",
+            "description": "This foundation configuration deliberately does not collect a name, email address, phone number, affiliation, or other identity fields. The statutory confidential/pseudonymous and open-with-consent modes require identity/content segregation and controlled unmasking that are not yet available in the generic engine.",
+            "fields": [
+              {
+                "id": "anonymous_mode_acknowledgment",
+                "type": "attestation",
+                "label": "Anonymous-mode acknowledgment",
+                "required": true,
+                "attestationText": "I understand that this foundation intake is anonymous and cannot yet provide protected follow-up communication or direct status messages."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "routingRules": [
+    {
+      "key": "urgent_received",
+      "name": "Urgent Received Submission",
+      "priority": 10,
+      "targetQueueSlug": "urgent_duty",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "case_type",
+            "operator": "equals",
+            "value": "secure-idea-submission"
+          },
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "received"
+          },
+          {
+            "field": "submission",
+            "fieldId": "urgency",
+            "operator": "equals",
+            "value": "immediate"
+          }
+        ]
+      }
+    },
+    {
+      "key": "default_received",
+      "name": "Default Intake and Triage",
+      "priority": 100,
+      "targetQueueSlug": "intake_triage",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "case_type",
+            "operator": "equals",
+            "value": "secure-idea-submission"
+          },
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "received"
+          }
+        ]
+      }
+    },
+    {
+      "key": "defense_panel",
+      "name": "Defense Technology Panel",
+      "priority": 200,
+      "targetQueueSlug": "defense_technology_review",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "expert_review"
+          },
+          {
+            "field": "submission",
+            "fieldId": "primary_domain",
+            "operator": "equals",
+            "value": "defense_technology"
+          }
+        ]
+      }
+    },
+    {
+      "key": "cyber_panel",
+      "name": "Cybersecurity Panel",
+      "priority": 210,
+      "targetQueueSlug": "cybersecurity_review",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "expert_review"
+          },
+          {
+            "field": "submission",
+            "fieldId": "primary_domain",
+            "operator": "equals",
+            "value": "cybersecurity"
+          }
+        ]
+      }
+    },
+    {
+      "key": "intelligence_panel",
+      "name": "Intelligence and Foreign Threats Panel",
+      "priority": 220,
+      "targetQueueSlug": "intelligence_foreign_threats_review",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "expert_review"
+          },
+          {
+            "field": "submission",
+            "fieldId": "primary_domain",
+            "operator": "equals",
+            "value": "intelligence_foreign_threats"
+          }
+        ]
+      }
+    },
+    {
+      "key": "homeland_panel",
+      "name": "Homeland Security and Law Enforcement Panel",
+      "priority": 230,
+      "targetQueueSlug": "homeland_law_enforcement_review",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "expert_review"
+          },
+          {
+            "field": "submission",
+            "fieldId": "primary_domain",
+            "operator": "equals",
+            "value": "homeland_law_enforcement"
+          }
+        ]
+      }
+    },
+    {
+      "key": "science_panel",
+      "name": "Science and Technology Innovations Panel",
+      "priority": 240,
+      "targetQueueSlug": "science_technology_review",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "expert_review"
+          },
+          {
+            "field": "submission",
+            "fieldId": "primary_domain",
+            "operator": "equals",
+            "value": "science_technology"
+          }
+        ]
+      }
+    },
+    {
+      "key": "policy_panel",
+      "name": "Policy and Governance Panel",
+      "priority": 250,
+      "targetQueueSlug": "policy_governance_review",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "expert_review"
+          },
+          {
+            "field": "submission",
+            "fieldId": "primary_domain",
+            "operator": "equals",
+            "value": "policy_governance"
+          }
+        ]
+      }
+    },
+    {
+      "key": "general_panel",
+      "name": "General and Multidomain Panel",
+      "priority": 260,
+      "targetQueueSlug": "general_multidomain_review",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "expert_review"
+          },
+          {
+            "field": "submission",
+            "fieldId": "primary_domain",
+            "operator": "equals",
+            "value": "other_multidomain"
+          }
+        ]
+      }
+    },
+    {
+      "key": "referral_coordination_route",
+      "name": "Referral Coordination",
+      "priority": 300,
+      "targetQueueSlug": "referral_coordination",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "referral_preparation"
+          }
+        ]
+      }
+    },
+    {
+      "key": "agency_followup_route",
+      "name": "Agency Follow-up",
+      "priority": 400,
+      "targetQueueSlug": "agency_followup",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "any",
+        "conditions": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "referred_to_agency"
+          },
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "agency_preliminary_response"
+          },
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "agency_follow_up"
+          }
+        ]
+      }
+    }
+  ],
+  "reviewPolicies": []
+}
