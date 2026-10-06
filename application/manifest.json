@@ -4,7 +4,7 @@
     "key": "secure_innovation_gateway",
     "name": "Secure Innovation Gateway",
     "shortName": "SIG",
-    "description": "Application configuration for receiving, triaging, evaluating, referring, and tracking unclassified national-security-relevant submissions under the National Secure Ideas Submission Act of 2025.",
+    "description": "Application configuration for receiving, protecting, triaging, evaluating, referring, and tracking unclassified national-security-relevant submissions under the National Secure Ideas Submission Act of 2025.",
     "branding": {
       "accentColor": "#17365D",
       "homeTitle": "American Innovation Shield",
@@ -126,6 +126,40 @@
         "correspondence:view",
         "correspondence:manage",
         "notification:view"
+      ]
+    },
+    {
+      "key": "sig_intake_privacy_officer",
+      "name": "SIG Intake & Privacy Officer",
+      "description": "Handles protected submitter-identity operations and may request one-time access to an identity compartment when a documented need-to-know exists.",
+      "permissions": [
+        "organization:view",
+        "submission:view",
+        "case:view",
+        "protected_data:view_metadata",
+        "protected_data:request_reveal",
+        "note:view",
+        "note:create_internal",
+        "correspondence:view",
+        "correspondence:manage",
+        "notification:view",
+        "audit:view"
+      ]
+    },
+    {
+      "key": "sig_privacy_officer",
+      "name": "SIG Privacy Officer",
+      "description": "Independently reviews protected identity-access requests and may approve or reject them; this role does not itself request a reveal in the PR 2 configuration.",
+      "permissions": [
+        "organization:view",
+        "submission:view",
+        "case:view",
+        "protected_data:view_metadata",
+        "protected_data:approve_reveal",
+        "note:view",
+        "correspondence:view",
+        "notification:view",
+        "audit:view"
       ]
     },
     {
@@ -938,14 +972,14 @@
     {
       "slug": "secure-idea-submission",
       "name": "Secure Innovation Gateway Submission",
-      "description": "Foundation unclassified intake for anonymous national-security-relevant submissions. Protected identity/contact intake and public attachments are intentionally deferred until the required controls are available.",
+      "description": "Unclassified SIG intake supporting fully anonymous, confidential/pseudonymous, and open-with-consent identity choices. Protected identity values are stored separately from ordinary submission content.",
       "accessMode": "public",
       "workflowSlug": "sig_submission_workflow",
       "definition": {
         "schemaVersion": 1,
-        "intro": "Use this form only for unclassified information. This foundation release accepts anonymous content submissions and does not collect identifying/contact information. Do not include classified information. If information is or may be classified, use an approved secure channel designated by SIG.",
+        "intro": "Use this form only for unclassified information. Choose how SIG should handle your identity, then provide the idea, innovation, vulnerability, operational insight, policy issue, or wrongdoing report for review. Do not include classified information. If information is or may be classified, use an approved secure channel designated by SIG.",
         "submitLabel": "Submit to SIG",
-        "confirmationMessage": "Your unclassified submission has been received. Save the confirmation information shown by the system. Protected submitter status and messaging are not yet enabled in this foundation release.",
+        "confirmationMessage": "Your unclassified submission has been received. Save the confirmation information shown by the system. Protected public status lookup and secure submitter messaging are not yet enabled in this release.",
         "sections": [
           {
             "id": "security_notice",
@@ -965,6 +999,190 @@
                 "label": "Good-faith attestation",
                 "required": true,
                 "attestationText": "I am submitting in good faith and believe the information may be relevant to United States national security or public safety."
+              }
+            ]
+          },
+          {
+            "id": "identity_and_privacy",
+            "title": "Identity and Privacy",
+            "description": "SIG supports fully anonymous submissions, confidential/pseudonymous identity, and open identity with consent. Identifying information is stored in a protected compartment separate from ordinary submission content.",
+            "fields": [
+              {
+                "id": "identity_mode",
+                "type": "select",
+                "label": "How should SIG handle your identity?",
+                "required": true,
+                "options": [
+                  {
+                    "value": "fully_anonymous",
+                    "label": "Fully anonymous — do not provide identifying information"
+                  },
+                  {
+                    "value": "confidential_pseudonymous",
+                    "label": "Confidential / pseudonymous — provide identity to SIG but keep it protected"
+                  },
+                  {
+                    "value": "open_with_consent",
+                    "label": "Open with consent — provide identity and authorize the selected disclosure/contact scope"
+                  }
+                ]
+              },
+              {
+                "id": "identity_name",
+                "type": "short_text",
+                "label": "Name",
+                "required": true,
+                "condition": {
+                  "fieldId": "identity_mode",
+                  "operator": "not_equals",
+                  "value": "fully_anonymous"
+                },
+                "validation": {
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "protection": {
+                  "compartment": "submitter_identity",
+                  "revealPolicy": "dual_control"
+                }
+              },
+              {
+                "id": "identity_email",
+                "type": "email",
+                "label": "Email address (optional)",
+                "required": false,
+                "condition": {
+                  "fieldId": "identity_mode",
+                  "operator": "not_equals",
+                  "value": "fully_anonymous"
+                },
+                "validation": {
+                  "maxLength": 320
+                },
+                "protection": {
+                  "compartment": "submitter_identity",
+                  "revealPolicy": "dual_control"
+                }
+              },
+              {
+                "id": "identity_phone",
+                "type": "phone",
+                "label": "Phone number (optional)",
+                "required": false,
+                "condition": {
+                  "fieldId": "identity_mode",
+                  "operator": "not_equals",
+                  "value": "fully_anonymous"
+                },
+                "validation": {
+                  "maxLength": 100
+                },
+                "protection": {
+                  "compartment": "submitter_identity",
+                  "revealPolicy": "dual_control"
+                }
+              },
+              {
+                "id": "identity_affiliation",
+                "type": "short_text",
+                "label": "Affiliation or organization (optional)",
+                "required": false,
+                "condition": {
+                  "fieldId": "identity_mode",
+                  "operator": "not_equals",
+                  "value": "fully_anonymous"
+                },
+                "validation": {
+                  "maxLength": 300
+                },
+                "protection": {
+                  "compartment": "submitter_identity",
+                  "revealPolicy": "dual_control"
+                }
+              },
+              {
+                "id": "confidential_disclosure_preference",
+                "type": "select",
+                "label": "Identity-disclosure preference",
+                "required": true,
+                "condition": {
+                  "fieldId": "identity_mode",
+                  "operator": "equals",
+                  "value": "confidential_pseudonymous"
+                },
+                "options": [
+                  {
+                    "value": "ask_before_agency_disclosure",
+                    "label": "Ask me before sharing my identity with a participating agency if I can be reached"
+                  },
+                  {
+                    "value": "standard_confidential_handling",
+                    "label": "Apply SIG's standard confidential handling rules"
+                  }
+                ],
+                "protection": {
+                  "compartment": "submitter_identity",
+                  "revealPolicy": "dual_control"
+                }
+              },
+              {
+                "id": "open_identity_scope",
+                "type": "select",
+                "label": "Open-identity consent scope",
+                "required": true,
+                "condition": {
+                  "fieldId": "identity_mode",
+                  "operator": "equals",
+                  "value": "open_with_consent"
+                },
+                "options": [
+                  {
+                    "value": "agency_disclosure",
+                    "label": "SIG may disclose my identity to participating agencies when appropriate"
+                  },
+                  {
+                    "value": "direct_contact",
+                    "label": "SIG may arrange direct contact with evaluators when appropriate"
+                  },
+                  {
+                    "value": "agency_disclosure_and_direct_contact",
+                    "label": "Both agency identity disclosure and direct evaluator contact"
+                  }
+                ],
+                "protection": {
+                  "compartment": "submitter_identity",
+                  "revealPolicy": "dual_control"
+                }
+              },
+              {
+                "id": "identity_contact_notes",
+                "type": "long_text",
+                "label": "Identity/contact handling notes (optional)",
+                "required": false,
+                "condition": {
+                  "fieldId": "identity_mode",
+                  "operator": "not_equals",
+                  "value": "fully_anonymous"
+                },
+                "validation": {
+                  "maxLength": 2000
+                },
+                "protection": {
+                  "compartment": "submitter_identity",
+                  "revealPolicy": "dual_control"
+                }
+              },
+              {
+                "id": "anonymous_mode_acknowledgment",
+                "type": "attestation",
+                "label": "Anonymous-mode acknowledgment",
+                "required": true,
+                "condition": {
+                  "fieldId": "identity_mode",
+                  "operator": "equals",
+                  "value": "fully_anonymous"
+                },
+                "attestationText": "I understand that if I provide no identifying or contact information, SIG may be unable to ask me follow-up questions or provide direct feedback."
               }
             ]
           },
@@ -1201,20 +1419,6 @@
                   "minLength": 10,
                   "maxLength": 5000
                 }
-              }
-            ]
-          },
-          {
-            "id": "foundation_privacy_notice",
-            "title": "Foundation Privacy Limitation",
-            "description": "This foundation configuration deliberately does not collect a name, email address, phone number, affiliation, or other identity fields. The statutory confidential/pseudonymous and open-with-consent modes require identity/content segregation and controlled unmasking that are not yet available in the generic engine.",
-            "fields": [
-              {
-                "id": "anonymous_mode_acknowledgment",
-                "type": "attestation",
-                "label": "Anonymous-mode acknowledgment",
-                "required": true,
-                "attestationText": "I understand that this foundation intake is anonymous and cannot yet provide protected follow-up communication or direct status messages."
               }
             ]
           }
