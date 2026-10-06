@@ -22,13 +22,13 @@ jobs:
           node-version: 22
 
       - name: Verify downstream policy guardrails
-        run: node scripts/verify-foundation.mjs
+        run: node scripts/verify-policy.mjs
 
       - name: Checkout pinned engine source
         uses: actions/checkout@v4
         with:
           repository: neophilism/Secure-Intake-Case-Workflow-Engine
-          ref: 84362ad69ffd45a421d026c1c6a5ec0621a6b203
+          ref: b8db6155657d7f7576fde72f1dba0563c190c853
           path: .engine
 
       - name: Install pinned engine dependencies
