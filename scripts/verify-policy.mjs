@@ -44,6 +44,10 @@ assert(
   byId.has("unclassified_attestation"),
   "classified-information warning/attestation is required",
 );
+assert(
+  byId.has("submitter_eligibility_attestation"),
+  "source-defined submitter eligibility attestation is required",
+);
 
 const identityMode = byId.get("identity_mode");
 assert(identityMode?.type === "select", "identity_mode must be a select field");
