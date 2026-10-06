@@ -521,7 +521,7 @@
             "actions": [
               {
                 "type": "set_priority",
-                "value": "urgent"
+                "value": "critical"
               },
               {
                 "type": "add_tag",
@@ -875,7 +875,7 @@
               "record_preliminary_agency_response"
             ],
             "escalation": {
-              "priority": "urgent",
+              "priority": "critical",
               "queueSlug": "oversight_compliance"
             }
           },
