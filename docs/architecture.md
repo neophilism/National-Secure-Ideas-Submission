@@ -9,6 +9,7 @@ The upstream engine remains domain-neutral. This repository owns:
 - SIG branding and terminology;
 - application roles;
 - intake forms and privacy choices;
+- participant-access policy;
 - workflow states/transitions;
 - deadlines;
 - teams/queues and routing;
@@ -19,7 +20,7 @@ The upstream engine remains domain-neutral. This repository owns:
 
 ## Engine pin
 
-PR 2 is developed against the exact upstream source commit recorded in `engine.lock.json` and targets the matching `1.0.0-rc.2` image.
+PR 3 is developed against the exact upstream source commit recorded in `engine.lock.json` and targets the matching `1.0.0-rc.4` image.
 
 The deployment should move to an immutable image digest once the release image is published.
 
@@ -33,18 +34,63 @@ The public form exposes three source-derived identity choices:
 - confidential/pseudonymous;
 - open with consent.
 
-`identity_mode` is ordinary workflow data. Identifying/contact fields are different: they are assigned to the encrypted `submitter_identity` compartment and therefore do not enter the ordinary submission-answer JSON.
+`identity_mode` is ordinary workflow data. Identifying/contact fields are assigned to the encrypted `submitter_identity` compartment and therefore do not enter ordinary submission-answer JSON.
 
 Ordinary triage officers, expert reviewers, case officers, agency liaisons, supervisors, and application auditors receive no protected-data permission through this manifest.
 
-The two SIG privacy roles are intentionally asymmetric:
+The two SIG privacy roles remain asymmetric:
 
 - `sig_intake_privacy_officer` can see compartment metadata and request a reveal;
 - `sig_privacy_officer` can see compartment metadata and approve/reject a reveal but cannot request one.
 
-The upstream engine separately prevents requester self-approval, gives approvals a short lifetime, makes reveal one-time, and records request/decision/reveal audit events without copying protected plaintext into the audit stream.
+## External participant portal
 
-This role split is stricter than relying on the engine prohibition alone and makes the downstream operational intent explicit.
+The participant portal is enabled on the SIG intake form for every submission.
+
+The authentication credential consists of:
+
+- the ordinary tracking/confirmation code; and
+- a separate high-entropy participant access secret shown once after submission.
+
+The access secret is not an identity field and is not a staff credential. The engine stores only its hash.
+
+### Status access
+
+Every participant credential can resolve a bounded status surface:
+
+- tracking/confirmation code;
+- submission receipt time;
+- case number after case creation;
+- configured workflow-state label;
+- status timestamp.
+
+This deliberately does not include submission answers, protected identity, internal notes, assignments, deadlines, audit history, staff identities, or documents.
+
+### Messaging policy
+
+SIG applies rc.4 conditional messaging using the ordinary `identity_mode` field:
+
+```text
+fully_anonymous          -> status-only
+confidential_pseudonymous -> status + secure messages
+open_with_consent         -> status + secure messages
+```
+
+The engine evaluates this against the immutable form-version definition and ordinary submission answer snapshot. Protected identity never has to be decrypted to authorize participant messaging.
+
+When status-only applies:
+
+- no participant-visible messages are returned;
+- the participant cannot start a message;
+- the participant cannot reply to a thread.
+
+When messaging applies:
+
+- only participant/public portal correspondence belonging to the participant's own case is visible;
+- participant replies are recorded as inbound portal correspondence;
+- internal messages and staff-only case data remain inaccessible.
+
+This lets SIG request additional information securely without putting sensitive submission content in ordinary email.
 
 ## Security posture
 
@@ -52,13 +98,15 @@ This repository still defines an **unclassified web application** only.
 
 It must not be represented as satisfying the package's classified-system requirements, FISMA authorization, High-Value Asset designation, FIPS 140-3 validation, HSM architecture, clearance/need-to-know processes, or Authority to Operate. Those are deployment/accreditation and cryptographic-module requirements beyond a manifest.
 
-The protected-data engine feature provides application-level separation and authenticated encryption. It is not, by itself, evidence that a deployment meets the source package's federal cryptographic or classified-system requirements.
+Protected structured identity and participant credentials materially improve application privacy, but they do not convert this deployment into an accredited classified-information channel.
 
-## External participant boundary
+## Participant session boundary
 
-PR 2 securely stores optional identity/contact information but does not yet expose the source-described protected public status/messaging portal.
+Participant sessions are separate from internal staff authentication.
 
-A confirmation code is not treated as proof that secure external participant messaging exists. That reusable capability is the next upstream feedback item.
+Deployment config uses a distinct participant cookie name and bounded TTL. The engine uses HttpOnly, SameSite=Strict cookies, secure cookies in production, server-side session revocation, and login throttling.
+
+The permanent participant access secret is not placed in URLs. Losing the one-time secret currently requires operational handling; no password/email recovery system is claimed.
 
 ## Upstream feedback rule
 

@@ -22,19 +22,22 @@ Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 22.
 - add the source-defined submitter eligibility attestation;
 - preserve the unclassified-only public intake boundary.
 
-PR 2 deliberately does **not** claim that the protected external participant portal exists.
-
 ## PR 3 — Protected participant status and messaging
 
-Implement the remaining reusable upstream participant capability, then consume it here:
+Reusable upstream prerequisites: Secure Intake & Case Workflow Engine PRs 23 and 24.
 
-- high-entropy external tracking credential;
-- protected public status lookup;
-- secure two-way submitter messaging;
-- additional-information requests without sensitive email content;
-- credential rotation/revocation/recovery policy;
-- account-based option with strong authentication where appropriate;
-- fully anonymous mode remains usable without contact.
+- update the engine pin to `1.0.0-rc.4`;
+- enable protected participant access for every SIG submission;
+- issue a high-entropy access secret separately from the tracking/confirmation code;
+- expose bounded status without ordinary case data;
+- make fully anonymous submissions true status-only sessions;
+- enable secure two-way portal messaging only for confidential/open identity modes;
+- support participant-safe additional-information requests and replies;
+- update SIG communication templates to use the protected portal rather than imply ordinary email transmission;
+- configure separate participant-session cookie and TTL;
+- preserve the no-attachment boundary until the public evidence pipeline exists.
+
+The source permits a non-account tracking-code plus PIN/passphrase path, so PR 3 uses the engine's per-submission credential model. Long-lived participant accounts, 2FA, and recovery are optional future enhancements rather than prerequisites for the status/messaging milestone.
 
 ## PR 4 — Public supporting evidence
 
@@ -45,7 +48,8 @@ Add the reusable public attachment pipeline:
 - hashing and provenance;
 - malware scanning/quarantine;
 - promotion into the case file only after clean status;
-- public UX for technical drawings/supporting documents.
+- public UX for technical drawings/supporting documents;
+- participant-message attachment policy if the generic engine supports it safely.
 
 ## PR 5 — Referral ledger and agency accountability
 
@@ -61,7 +65,7 @@ If implemented upstream as a reusable primitive, add first-class agency referral
 
 - staff queue tuning;
 - triage/panel/referral dashboard views;
-- submitter-safe communication templates;
+- participant-safe communication operations;
 - IP-interest handling workflow;
 - closure and feedback UX;
 - aggregate performance metrics mapped to SIG KPIs;
