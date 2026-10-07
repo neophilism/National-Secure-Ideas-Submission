@@ -37,17 +37,20 @@ This file records what the downstream application currently implements, what is 
 | Fully anonymous submitters cannot receive direct follow-up/feedback | SOP §4.2.3 | `identity_mode = fully_anonymous` resolves to status-only participant access; no messages are returned or accepted |
 | Confidential/open submitters can securely communicate with SIG | Act §5(6); SOP §4.2.6 | Conditional secure portal messaging when `identity_mode != fully_anonymous` |
 | SIG may securely request additional information | Act §5(6); SOP §§4.2.6, 4.4 | Participant-visible portal correspondence and participant replies |
+| Technical drawings and unclassified supporting files may accompany a submission | Act §3; SOP intake/security provisions | Optional `supporting_materials` public file field bound to the supporting-material document type; SHA-256 provenance; immutable submission links; mandatory quarantine; only a recorded clean scan can promote content into case evidence |
 | Sensitive content should not be exposed through ordinary email | SOP §4.2.6 | SIG communication templates direct participants to the protected portal; portal messages remain inside the participant channel |
 
 ## Deliberately not implemented yet
 
-### 1. Public supporting-file intake and malware quarantine — blocking
+### 1. Production malware-scanner / sandbox integration — deployment boundary
 
-The source contemplates technical drawings and supporting files and requires malware scanning/sandboxing. The engine has staff document handling and malware status controls, but the generic public form does not currently enable secure public attachment persistence.
+PR 4 implements public file transport, SHA-256 provenance, immutable submission linking, quarantine, malware-status recording, and a hard clean-scan gate before case-evidence promotion.
 
-**Current behavior:** supporting-material document types are declared for staff-side handling; the public form contains no file field and participant messages do not accept attachments.
+The generic engine intentionally does **not** pretend to be a malware-scanner product and never marks a file clean merely because upload succeeded.
 
-**Required next step:** add reusable public upload staging, malware quarantine, hash/provenance, and controlled attachment promotion.
+**Required before operational public-file acceptance:** connect an approved malware scanner or authorized external scan/sandbox process and validate that its results are recorded through the document scan-status path. Pending, failed, or infected files remain unavailable.
+
+Participant-message attachments remain disabled; PR 4 covers public intake supporting files only.
 
 ### 2. Classified information — deployment/accreditation boundary
 

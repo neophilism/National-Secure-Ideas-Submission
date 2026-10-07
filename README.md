@@ -6,22 +6,29 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 3 — protected participant status and conditional secure messaging**
+**PR 4 — public supporting evidence**
 
-PR 3 upgrades the application to the engine's protected external-participant portal and applies the source-derived privacy split:
+PR 4 enables unclassified supporting-file intake through the reusable rc.5
+public attachment pipeline:
 
-- every submitted matter receives a tracking/confirmation code plus a separate high-entropy participant access secret;
-- the access secret is shown once and only its hash is stored by the engine;
-- participants authenticate to a separate participant portal rather than the staff application;
-- every submission can pull bounded status with the saved credentials;
-- fully anonymous submissions are **status-only**;
-- confidential/pseudonymous and open-with-consent submissions can use secure two-way portal messaging;
-- participant messaging is controlled by the ordinary `identity_mode` field, never by decrypting protected identity data;
-- participant-visible messages are limited to the submitter's own case and participant/public portal correspondence;
-- internal notes, protected identity, submission answers, assignments, deadlines, audit history, staff identities, and documents are not exposed;
-- additional-information requests and status correspondence can use the protected portal rather than sensitive ordinary email.
+- submitters may attach technical drawings, diagrams, documents, and images to
+  the ordinary unclassified intake;
+- each file is bound server-side to the SIG supporting-material document type;
+- file-count, MIME, per-file size, and aggregate submission limits are enforced;
+- the engine computes SHA-256 provenance and stores immutable document versions;
+- every public attachment begins in `quarantined / pending` state;
+- quarantined, failed, or infected content is not trusted case evidence;
+- only a recorded clean malware scan can make an attachment available;
+- a clean attachment is promoted into the source case whether scanning completes
+  before or after case creation;
+- file bytes remain outside ordinary submission-answer JSON.
 
-The existing workflow continues to provide intake/triage, urgent handling, expert-panel review, referral preparation, agency-response deadlines, overdue escalation, IP/proprietary-interest flags, and closure states.
+Participant-message attachments remain disabled. Supporting files are accepted
+only through the intake file field added by this milestone.
+
+The existing participant privacy split remains unchanged: fully anonymous
+submissions have protected status-only access, while confidential/pseudonymous
+and open-with-consent submissions may also use secure portal messaging.
 
 ## Security boundary
 
@@ -52,9 +59,9 @@ This preserves the source's distinction between anonymous status tracking and di
 
 Pinned engine:
 
-- version: `1.0.0-rc.4`
-- source commit: `b7b1f74ed210d68eb61015efc6850167d03721da`
-- target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.4`
+- version: `1.0.0-rc.5`
+- source commit: `f58a5d08f9296318375460ece35e4e4c754f4ff4`
+- target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.5`
 - manifest schema: `1`
 
 See `engine.lock.json`.
@@ -73,25 +80,29 @@ The engine release image must be published before the default Compose deployment
 
 3. Keep the participant-session cookie name distinct from the staff-session cookie. The default participant TTL is 8 hours and can be changed with `PARTICIPANT_SESSION_TTL_HOURS`.
 
-4. Start PostgreSQL:
+4. Keep `DOCUMENT_MAX_BYTES` and `PUBLIC_UPLOAD_TOTAL_MAX_BYTES` at or below the deployment limits you intend to support. The supplied development configuration permits up to 50 MB per supporting file and 50 MB combined attachments per submission, inside the engine's 64 MB multipart transport ceiling.
+
+5. Connect an approved malware scanner or authorized external scan process before treating public uploads as operational evidence. The engine deliberately leaves uploads quarantined until a clean result is recorded.
+
+6. Start PostgreSQL:
 
    ```bash
    docker compose --env-file deployment/.env -f deployment/compose.yaml up -d postgres
    ```
 
-5. Run engine migrations. Upgrading from the PR 2 engine applies the participant-portal migration as part of the normal chain:
+7. Run engine migrations. Upgrading from the PR 2 engine applies the participant-portal migration as part of the normal chain:
 
    ```bash
    docker compose --env-file deployment/.env -f deployment/compose.yaml run --rm engine npm run db:migrate
    ```
 
-6. Bootstrap the SIG organization administrator:
+8. Bootstrap the SIG organization administrator:
 
    ```bash
    docker compose --env-file deployment/.env -f deployment/compose.yaml run --rm engine npm run auth:bootstrap
    ```
 
-7. Apply the manifest:
+9. Apply the manifest:
 
    ```bash
    docker compose --env-file deployment/.env -f deployment/compose.yaml run --rm engine \
@@ -101,9 +112,9 @@ The engine release image must be published before the default Compose deployment
      --actor-email "${BOOTSTRAP_ADMIN_EMAIL}"
    ```
 
-8. Assign at least one person to `sig_intake_privacy_officer` and a different person to `sig_privacy_officer` before operationally accepting confidential identities.
+10. Assign at least one person to `sig_intake_privacy_officer` and a different person to `sig_privacy_officer` before operationally accepting confidential identities.
 
-9. Start the web application and worker:
+11. Start the web application and worker:
 
    ```bash
    docker compose --env-file deployment/.env -f deployment/compose.yaml up -d engine worker

@@ -11,7 +11,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const ENGINE_COMMIT = "b7b1f74ed210d68eb61015efc6850167d03721da";
+const ENGINE_COMMIT = "f58a5d08f9296318375460ece35e4e4c754f4ff4";
 
 assert(manifest.schemaVersion === 1, "manifest schemaVersion must be 1");
 assert(
@@ -20,16 +20,16 @@ assert(
 );
 assert(
   lock.engine?.sourceCommit === ENGINE_COMMIT,
-  "engine source pin must match the merged protected-data engine commit",
+  "engine source pin must match the reviewed public-attachment engine commit",
 );
 assert(
-  lock.engine?.version === "1.0.0-rc.4",
-  "engine version pin must be 1.0.0-rc.4",
+  lock.engine?.version === "1.0.0-rc.5",
+  "engine version pin must be 1.0.0-rc.5",
 );
 assert(
   lock.engine?.image ===
-    "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.4",
-  "engine image pin must be 1.0.0-rc.4",
+    "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.5",
+  "engine image pin must be 1.0.0-rc.5",
 );
 
 const form = manifest.forms?.find(
@@ -136,8 +136,43 @@ assert(
 
 const fileFields = fields.filter((field) => field.type === "file");
 assert(
-  fileFields.length === 0,
-  "public file upload must remain disabled until the quarantine pipeline exists",
+  fileFields.length === 1,
+  "SIG must expose exactly one public supporting-material file field",
+);
+const supportingMaterials = byId.get("supporting_materials");
+assert(
+  supportingMaterials?.type === "file",
+  "supporting_materials must remain a file field",
+);
+assert(
+  supportingMaterials?.required === false,
+  "supporting materials must remain optional",
+);
+assert(
+  supportingMaterials?.publicUpload?.documentTypeKey ===
+    "submission_supporting_material",
+  "supporting materials must bind to the submission supporting-material document type",
+);
+assert(
+  supportingMaterials?.publicUpload?.visibility === "internal",
+  "public supporting materials must enter the internal evidence boundary",
+);
+assert(
+  supportingMaterials?.maxFiles === 10,
+  "supporting-material file count policy unexpectedly changed",
+);
+const supportingType = manifest.documentTypes.find(
+  (type) => type.key === "submission_supporting_material",
+);
+assert(supportingType, "submission supporting-material document type is required");
+assert(
+  supportingType.maxBytes === 52428800,
+  "supporting-material per-file size limit must remain 50 MB",
+);
+assert(
+  JSON.stringify(supportingMaterials.acceptedMimeTypes) ===
+    JSON.stringify(supportingType.acceptedMimeTypes),
+  "public field MIME policy must match the supporting-material document type",
 );
 
 const roleByKey = new Map(manifest.roles.map((role) => [role.key, role]));

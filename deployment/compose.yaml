@@ -14,7 +14,7 @@ services:
       - sig_postgres:/var/lib/postgresql/data
 
   engine:
-    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.4}
+    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.5}
     depends_on:
       postgres:
         condition: service_healthy
@@ -30,6 +30,10 @@ services:
       AUTH_TRUST_PROXY_HEADERS: ${AUTH_TRUST_PROXY_HEADERS:-false}
       WEBHOOK_ENCRYPTION_KEY: ${WEBHOOK_ENCRYPTION_KEY:-}
       PROTECTED_DATA_ENCRYPTION_KEY: ${PROTECTED_DATA_ENCRYPTION_KEY:-}
+      DOCUMENT_STORAGE_DRIVER: local
+      DOCUMENT_STORAGE_ROOT: /app/.data/documents
+      DOCUMENT_MAX_BYTES: ${DOCUMENT_MAX_BYTES:-52428800}
+      PUBLIC_UPLOAD_TOTAL_MAX_BYTES: ${PUBLIC_UPLOAD_TOTAL_MAX_BYTES:-52428800}
       BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-admin@sig.local}
       BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
       BOOTSTRAP_ORGANIZATION_NAME: Secure Innovation Gateway
@@ -38,9 +42,10 @@ services:
       - "${APP_PORT:-3000}:3000"
     volumes:
       - ../application:/application:ro
+      - sig_documents:/app/.data/documents
 
   worker:
-    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.4}
+    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.5}
     command: ["npm", "run", "worker"]
     depends_on:
       postgres:
@@ -53,6 +58,11 @@ services:
       PARTICIPANT_SESSION_TTL_HOURS: ${PARTICIPANT_SESSION_TTL_HOURS:-8}
       WEBHOOK_ENCRYPTION_KEY: ${WEBHOOK_ENCRYPTION_KEY:-}
       PROTECTED_DATA_ENCRYPTION_KEY: ${PROTECTED_DATA_ENCRYPTION_KEY:-}
+      DOCUMENT_STORAGE_DRIVER: local
+      DOCUMENT_STORAGE_ROOT: /app/.data/documents
+    volumes:
+      - sig_documents:/app/.data/documents
 
 volumes:
   sig_postgres:
+  sig_documents:
