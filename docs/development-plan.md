@@ -70,13 +70,16 @@ Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 26.
 
 ## PR 6 — Operational SIG experience
 
-- staff queue tuning;
-- triage/panel/referral dashboard views;
-- participant-safe communication operations;
-- IP-interest handling workflow;
-- closure and feedback UX;
-- aggregate performance metrics mapped to SIG KPIs;
-- approved identity-verification integration points if required for deployment.
+Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 27.
+
+- update the engine pin to `1.0.0-rc.7`;
+- tune referral/agency queues and add a dedicated IP/proprietary-interest coordination queue;
+- ship shared intake, urgent, panel, IP, referral, agency, compliance and closure work views;
+- expose source-derived workload and deadline-compliance metrics through the generic Operations page;
+- make staff portal correspondence honor the participant's immutable messaging eligibility;
+- add an explicit IP/proprietary-interest coordination step before referral when needed;
+- add protected-portal closure feedback copy;
+- preserve identity verification as an approved-provider/deployment integration boundary rather than inventing a provider or exposing protected identity.
 
 ## PR 7 — Security/deployment acceptance
 
