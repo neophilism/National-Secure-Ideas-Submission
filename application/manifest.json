@@ -218,7 +218,7 @@
     {
       "key": "submission_supporting_material",
       "name": "Submission Supporting Material",
-      "description": "Unclassified supporting material associated with a submission. Public upload is not enabled in the foundation release.",
+      "description": "Unclassified technical drawings and supporting material submitted through the public SIG intake. Public files remain quarantined until a clean malware scan is recorded.",
       "acceptedMimeTypes": [
         "application/pdf",
         "text/plain",
@@ -972,7 +972,7 @@
     {
       "slug": "secure-idea-submission",
       "name": "Secure Innovation Gateway Submission",
-      "description": "Unclassified SIG intake supporting fully anonymous, confidential/pseudonymous, and open-with-consent identity choices, protected status tracking for every submission, and secure messaging for non-anonymous submissions.",
+      "description": "Unclassified SIG intake supporting protected identity choices, protected participant status/messaging, and quarantined public supporting-file submission.",
       "accessMode": "public",
       "workflowSlug": "sig_submission_workflow",
       "definition": {
@@ -1328,6 +1328,25 @@
                 "validation": {
                   "minLength": 50,
                   "maxLength": 20000
+                }
+              },
+              {
+                "id": "supporting_materials",
+                "type": "file",
+                "label": "Unclassified supporting materials",
+                "helpText": "Attach unclassified technical drawings, diagrams, documents, or images that help evaluate the submission. Files are quarantined and are not treated as trusted evidence until malware scanning records a clean result. Do not attach classified information.",
+                "required": false,
+                "acceptedMimeTypes": [
+                  "application/pdf",
+                  "text/plain",
+                  "image/png",
+                  "image/jpeg",
+                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                ],
+                "maxFiles": 10,
+                "publicUpload": {
+                  "documentTypeKey": "submission_supporting_material",
+                  "visibility": "internal"
                 }
               },
               {
