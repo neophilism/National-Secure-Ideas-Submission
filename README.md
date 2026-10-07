@@ -6,34 +6,34 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 8 — security and deployment acceptance**
+**PR 9 — production runtime enablement**
 
-PR 8 defines the production go-live contract for the unclassified SIG
-application. It does not claim that source control can issue an ATO, accredit a
-classified system, certify a network, or prove an external control is operating.
+The first production-provisioning attempt exposed two reusable runtime gaps in
+the rc.7 document path: cloud deployments were limited to local filesystem
+document storage, and malware-scan results had to be supplied by an external
+process rather than entering an automatic worker queue.
 
-The repository now includes:
+SIG now targets engine rc.8, which adds S3-compatible durable document storage,
+a generic HTTPS malware-scanner adapter, and automatic `document.scan`
+background jobs for every persisted document version.
 
-- a separate production Compose definition with loopback-only web exposure,
-  internal-only database networking, dropped application capabilities and
-  bounded container logs;
-- a production environment contract requiring HTTPS, `__Host-` session
-  cookies, immutable image digests and protected-data key custody;
-- a machine-enforced production preflight;
-- a go-live control catalog and evidence template covering staff MFA/IdP,
-  reverse proxy/WAF, external egress firewalling, malware scanning, backup and
-  restore, SIEM, penetration testing, manual accessibility, records retention,
-  incident response and the unclassified-only boundary;
-- a hold-by-default records-retention configuration with no automatic
-  destructive disposition;
-- a production deployment/upgrade/recovery runbook.
+The production contract therefore requires:
 
-The current engine does not claim native staff MFA/IdP. Production staff routes
-therefore require an approved MFA-capable access gateway until reusable native
-federation is implemented upstream.
+- `DOCUMENT_STORAGE_DRIVER=s3` and a private S3-compatible bucket;
+- object-store credentials supplied as deployment secrets;
+- an HTTPS malware-scanner endpoint/provider;
+- the continuously running background worker that processes scan jobs.
 
-Passing the repository preflight confirms the declared configuration and
-evidence gates. It is not an ATO or classified-system accreditation.
+The trust model remains fail-closed: storage/scanner failure, a missing scanner,
+a failed scan, or a SHA-256 mismatch does not make a document available.
+
+Actual production provisioning is still blocked by external account/provider
+requirements recorded in
+[docs/production-provisioning-status.md](docs/production-provisioning-status.md).
+In particular, the connected Render workspace rejected creation of a paid
+production PostgreSQL instance because billing information is not configured.
+No external acceptance control is marked complete merely because the software
+adapter exists.
 
 ## Security boundary
 
@@ -64,9 +64,9 @@ This preserves the source's distinction between anonymous status tracking and di
 
 Pinned engine:
 
-- version: `1.0.0-rc.7`
-- source commit: `ca4cdd236de76674830c45a64178999efffe4010`
-- target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.7`
+- version: `1.0.0-rc.8`
+- source commit: `e2d744ac0032e479438251513596eb5c7f7f03f9`
+- target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.8`
 - manifest schema: `1`
 
 See `engine.lock.json`.
@@ -140,6 +140,7 @@ Production operators should use:
 - `deployment/production.env.example`
 - `deployment/security-acceptance.json`
 - `deployment/records-retention.json`
+- [Current provisioning status](docs/production-provisioning-status.md)
 
 A real production environment must pass:
 
