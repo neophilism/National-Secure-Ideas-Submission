@@ -95,15 +95,20 @@ same Git tree, so no application behavior changes are required.
 
 ## PR 8 — Security/deployment acceptance
 
-- production secret handling and key custody;
-- IdP/MFA integration plan;
-- network and egress controls;
-- storage/backup policy;
-- security logging/SIEM integration plan;
-- penetration-test checklist;
-- accessibility acceptance;
-- records-retention configuration;
-- deployment runbook.
+- add a separate hardened production Compose definition with loopback-only web exposure, internal database networking, dropped application capabilities, bounded logs, and immutable-image requirements;
+- add a production env contract and preflight that rejects moving image tags, placeholder secrets, insecure cookie/origin settings, bootstrap credentials, weak env-file permissions, and missing go-live evidence;
+- define protected-data key custody and webhook-key separation requirements;
+- require an approved MFA-capable staff access gateway because the engine does not claim native IdP/MFA;
+- define external default-deny egress, reverse-proxy/WAF and trusted-forwarding-header requirements;
+- make malware scanning a hard operational acceptance gate;
+- define coordinated database/document backup and restore testing with RPO/RTO evidence;
+- define least-privilege audit-event SIEM ingestion and alert tests;
+- add an authorized penetration-test checklist;
+- add manual WCAG 2.1 AA-compatible production accessibility acceptance;
+- add a machine-readable hold-by-default records-retention configuration with no destructive automation;
+- add incident-response evidence requirements and classified-boundary acknowledgment;
+- add a production deployment/upgrade/restore runbook;
+- validate the production acceptance template and production Compose definition in CI.
 
 ## Separate classified-channel program
 
