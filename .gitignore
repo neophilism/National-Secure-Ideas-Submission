@@ -5,3 +5,6 @@ deployment/.env
 node_modules/
 .DS_Store
 *.log
+deployment/production.env
+deployment/acceptance-evidence.json
+backups/
