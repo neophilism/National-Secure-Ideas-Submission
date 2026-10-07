@@ -41,15 +41,17 @@ The source permits a non-account tracking-code plus PIN/passphrase path, so PR 3
 
 ## PR 4 — Public supporting evidence
 
-Add the reusable public attachment pipeline:
+Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 25.
 
-- upload staging;
-- MIME/size policy;
-- hashing and provenance;
-- malware scanning/quarantine;
-- promotion into the case file only after clean status;
-- public UX for technical drawings/supporting documents;
-- participant-message attachment policy if the generic engine supports it safely.
+- update the engine pin to `1.0.0-rc.5`;
+- enable the source-contemplated unclassified technical drawing/supporting-file field;
+- bind public uploads to the SIG supporting-material document type;
+- enforce MIME, file-count, per-file-size, and aggregate-size policy;
+- retain SHA-256 provenance and immutable document versions;
+- quarantine every public upload until a clean malware scan is recorded;
+- promote only clean content into the case evidence set;
+- preserve the classified-information prohibition;
+- leave participant-message attachments disabled because the generic participant portal does not yet expose a safe attachment contract.
 
 ## PR 5 — Referral ledger and agency accountability
 
