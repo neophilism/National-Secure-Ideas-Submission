@@ -6,33 +6,44 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 5 — parallel agency referrals and accountability**
+**PR 6 — operational SIG experience**
 
-PR 5 replaces the earlier single-agency case-wide referral path with the
-engine's reusable rc.6 referral ledger.
+PR 6 turns the source-derived workflow into a staff-operable daily workspace
+using the reusable rc.7 application-operations profile.
 
-A SIG case may now contain multiple participating-agency referrals in parallel.
-Each referral records its own recipient, acknowledgment, response history,
-status, and accountability clocks. Routine referrals receive independent
-30-calendar-day preliminary-response and 90-calendar-day final-status clocks.
-Urgent referrals receive independent 72-hour preliminary-response and
-90-calendar-day final-status clocks.
+SIG now ships shared operational views for intake/triage, urgent review, all
+expert panels, pending submitter information, IP/proprietary-interest
+coordination, referral preparation, agency coordination, overdue compliance
+work, and recent closures. These views appear automatically on the engine's
+Operations page; individual staff may still keep separate personal saved views.
 
-An agreed extension is recorded against the specific referral deadline that was
-extended, including the reason and old/new due dates. Missed recipient clocks
-escalate through the existing `oversight_compliance` queue without collapsing
-the other referrals on the case into the same clock.
+The Operations page also exposes objective aggregate measures backed by
+authoritative case/deadline records:
 
-The parent SIG workflow now uses a single **Agency Coordination** state.
-Entering that state requires at least one actual referral. The case cannot move
-from Agency Coordination to Resolved while any referral remains open.
+- current intake/triage workload;
+- current expert-panel workload;
+- current agency-coordination workload;
+- current compliance-escalation workload;
+- three-business-day triage timeliness;
+- ten-business-day initial panel-review timeliness;
+- recipient-specific 30-day routine agency preliminary-response timeliness;
+- recipient-specific 72-hour urgent-response timeliness;
+- recipient-specific 90-day final-status timeliness.
 
-Referral recipients are operational case data rather than a hard-coded agency
-list in the application manifest. This keeps the software usable as participating
-agencies and interagency routing arrangements change.
+Cases with patent, trade-secret, or other proprietary interests can take an
+explicit **IP / Proprietary Interest Coordination** step before referral
+preparation. The step records an operational tag and routes the case to a
+dedicated coordination queue without inventing ownership, licensing, credit, or
+compensation outcomes.
 
-The existing unclassified-intake, protected-identity, participant-portal, and
-quarantined-supporting-file boundaries remain unchanged.
+Closure feedback uses a protected-portal template. The rc.7 engine derives
+participant-contact eligibility from the immutable intake policy, so staff
+cannot create or publish portal correspondence for fully anonymous/status-only
+submissions.
+
+No external identity-verification provider is wired by this PR. Any such
+integration must be separately approved and must consume protected identity only
+after the existing need-to-know dual-control reveal process.
 
 ## Security boundary
 
@@ -63,9 +74,9 @@ This preserves the source's distinction between anonymous status tracking and di
 
 Pinned engine:
 
-- version: `1.0.0-rc.6`
-- source commit: `6145c3401dcfdd64fa7b8bc1423bf52450aefe98`
-- target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.6`
+- version: `1.0.0-rc.7`
+- source commit: `75887e2ea8b691e0a1eb34b5169f5f030936b2d9`
+- target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.7`
 - manifest schema: `1`
 
 See `engine.lock.json`.
