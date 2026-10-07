@@ -48,7 +48,7 @@ PR 4 implements public file transport, SHA-256 provenance, immutable submission 
 
 The generic engine intentionally does **not** pretend to be a malware-scanner product and never marks a file clean merely because upload succeeded.
 
-**Required before operational public-file acceptance:** connect an approved malware scanner or authorized external scan/sandbox process and validate that its results are recorded through the document scan-status path. Pending, failed, or infected files remain unavailable.
+**Required before operational public-file acceptance:** connect an approved malware scanner or authorized external scan/sandbox process and validate that its results are recorded through the document scan-status path. Pending, failed, or infected files remain unavailable. PR 8 makes this a hard go-live evidence gate; it does not falsely mark an external scanner as implemented.
 
 Participant-message attachments remain disabled; PR 4 covers public intake supporting files only.
 
@@ -60,7 +60,7 @@ The upstream engine explicitly does not constitute an accredited classified syst
 
 **Current behavior:** the public form requires an attestation that classified information will not be submitted and directs classified material to an approved external secure channel once one exists.
 
-**Required before operational classified intake:** an appropriately authorized/accredited environment and integration design. This must not be simulated by ordinary application configuration.
+**Required before operational classified intake:** an appropriately authorized/accredited environment and integration design. This must not be simulated by ordinary application configuration. PR 8 requires an explicit unclassified-only production acceptance acknowledgment and does not relax this boundary.
 
 ### 3. Parallel multi-panel review — partially represented
 
@@ -89,7 +89,7 @@ The SOP permits confidential identity verification using appropriate public/prof
 
 **Current behavior:** protected identity data can be revealed only through the dual-control process. PR 6 deliberately does not automatically call identity-verification services or classified/government databases and documents this as an approved-provider deployment boundary.
 
-**Future work:** during deployment acceptance, define any approved verification adapter, authorization/purpose logging, provider-specific access controls, and evidence handling. An adapter must not expose protected identity to ordinary reviewers or bypass dual-control reveal.
+**PR 8 deployment posture:** if identity verification is required, the deployment authority must select an approved provider/adapter and define authorization, purpose logging, provider-specific access controls, and evidence handling before enabling it. No provider is selected or called by this repository. Any future adapter must not expose protected identity to ordinary reviewers or bypass dual-control reveal.
 
 ### 5. Long-lived participant accounts and credential recovery — optional future enhancement
 
