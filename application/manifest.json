@@ -49,7 +49,7 @@
     {
       "key": "sig_triage_officer",
       "name": "SIG Triage Officer",
-      "description": "Screens incoming submissions, identifies urgency and scope, records triage context, and routes substantive matters for expert review.",
+      "description": "Screens incoming submissions, identifies urgency and scope, records triage context, routes substantive matters for expert review, and may initiate urgent participating-agency referrals.",
       "permissions": [
         "submission:view",
         "case:create",
@@ -67,7 +67,8 @@
         "correspondence:manage",
         "notification:view",
         "routing:view",
-        "referral:view"
+        "referral:view",
+        "referral:manage"
       ]
     },
     {
