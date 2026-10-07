@@ -41,3 +41,17 @@ jobs:
 
       - name: Validate Compose configuration
         run: docker compose --env-file deployment/.env.example -f deployment/compose.yaml config
+
+      - name: Verify production deployment acceptance template
+        run: >-
+          node scripts/verify-production-deployment.mjs
+          --template
+          --env deployment/production.env.example
+          --evidence deployment/acceptance-evidence.example.json
+
+      - name: Validate production Compose configuration
+        run: >-
+          docker compose
+          --env-file deployment/production.env.example
+          -f deployment/compose.production.yaml
+          config
