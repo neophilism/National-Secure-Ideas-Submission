@@ -20,7 +20,7 @@ The upstream engine remains domain-neutral. This repository owns:
 
 ## Engine pin
 
-PR 3 is developed against the exact upstream source commit recorded in `engine.lock.json` and targets the matching `1.0.0-rc.4` image.
+PR 4 is developed against the exact upstream source commit recorded in `engine.lock.json` and targets the matching `1.0.0-rc.5` image.
 
 The deployment should move to an immutable image digest once the release image is published.
 
@@ -68,7 +68,7 @@ This deliberately does not include submission answers, protected identity, inter
 
 ### Messaging policy
 
-SIG applies rc.4 conditional messaging using the ordinary `identity_mode` field:
+SIG applies conditional messaging using the ordinary `identity_mode` field:
 
 ```text
 fully_anonymous          -> status-only
@@ -91,6 +91,35 @@ When messaging applies:
 - internal messages and staff-only case data remain inaccessible.
 
 This lets SIG request additional information securely without putting sensitive submission content in ordinary email.
+
+## Public supporting evidence
+
+The SIG intake exposes one optional `supporting_materials` file field. It is
+bound to the manifest-declared `submission_supporting_material` document type;
+the browser cannot select an arbitrary document category.
+
+Accepted public files are:
+
+- limited to the configured PDF, plain-text, PNG, JPEG, and DOCX MIME policy;
+- limited to 10 files, with a 50 MB per-file ceiling and a 50 MB combined
+  attachment ceiling in the supplied deployment configuration;
+- assigned engine-generated storage keys;
+- hashed with SHA-256 before persistence;
+- stored as immutable submission-linked document versions;
+- initialized as `quarantined / pending`.
+
+A browser upload is not itself a scan result. The engine does not mark a file
+clean by assumption. An approved scanner or authorized external scan process
+must record `clean` before the version becomes available and is promoted into
+case evidence. Pending, failed, and infected content remains outside the trusted
+case evidence surface.
+
+The public intake stores document-version references in the file-field answer;
+binary file content is not placed in ordinary answer JSON.
+
+This milestone does not enable participant-message attachments. It also does
+not change the unclassified-only boundary: the supporting-material help text
+and the existing submission attestation both prohibit classified information.
 
 ## Security posture
 
