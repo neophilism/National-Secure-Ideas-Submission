@@ -127,6 +127,31 @@ The engine release image must be published before the default Compose deployment
 
 The public participant login surface is under the engine's `/participant` path and uses the SIG organization slug plus the saved tracking/confirmation code and participant access secret.
 
+## Production deployment
+
+Do not use the local-development Compose file as the production security
+baseline.
+
+Production operators should use:
+
+- [Security and deployment acceptance](docs/security-deployment-acceptance.md)
+- [Production deployment runbook](docs/deployment-runbook.md)
+- `deployment/compose.production.yaml`
+- `deployment/production.env.example`
+- `deployment/security-acceptance.json`
+- `deployment/records-retention.json`
+
+A real production environment must pass:
+
+```bash
+node scripts/verify-production-deployment.mjs \
+  --env /secure/runtime/sig.env \
+  --evidence /secure/runtime/acceptance-evidence.json
+```
+
+The evidence file and rendered production secrets must remain outside source
+control.
+
 ## Development sequence
 
 See [docs/development-plan.md](docs/development-plan.md).
