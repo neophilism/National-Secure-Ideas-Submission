@@ -60,7 +60,7 @@ This preserves the source's distinction between anonymous status tracking and di
 Pinned engine:
 
 - version: `1.0.0-rc.5`
-- source commit: `6acafe32a8fc753d540ba03e9c772b07ec5a82e8`
+- source commit: `f58a5d08f9296318375460ece35e4e4c754f4ff4`
 - target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.5`
 - manifest schema: `1`
 
