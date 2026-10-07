@@ -11,7 +11,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const ENGINE_COMMIT = "f58a5d08f9296318375460ece35e4e4c754f4ff4";
+const ENGINE_COMMIT = "825d2ad4b177403739312570f4d44ace76a14287";
 
 assert(manifest.schemaVersion === 1, "manifest schemaVersion must be 1");
 assert(
@@ -20,16 +20,16 @@ assert(
 );
 assert(
   lock.engine?.sourceCommit === ENGINE_COMMIT,
-  "engine source pin must match the reviewed public-attachment engine commit",
+  "engine source pin must match the reviewed parallel-referral engine commit",
 );
 assert(
-  lock.engine?.version === "1.0.0-rc.5",
-  "engine version pin must be 1.0.0-rc.5",
+  lock.engine?.version === "1.0.0-rc.6",
+  "engine version pin must be 1.0.0-rc.6",
 );
 assert(
   lock.engine?.image ===
-    "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.5",
-  "engine image pin must be 1.0.0-rc.5",
+    "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.6",
+  "engine image pin must be 1.0.0-rc.6",
 );
 
 const form = manifest.forms?.find(
@@ -216,17 +216,180 @@ const workflow = manifest.workflows?.find(
 );
 assert(workflow, "SIG workflow is required");
 
+const stateKeys = new Set(
+  workflow.definition.states.map((state) => state.key),
+);
+assert(
+  stateKeys.has("agency_coordination"),
+  "workflow must contain the agency_coordination state",
+);
+for (const obsolete of [
+  "referred_to_agency",
+  "agency_preliminary_response",
+  "agency_follow_up",
+]) {
+  assert(
+    !stateKeys.has(obsolete),
+    `obsolete single-agency state must be removed: ${obsolete}`,
+  );
+}
+
 const deadlineKeys = new Set(
   workflow.definition.deadlinePolicies.map((policy) => policy.key),
 );
 for (const key of [
   "triage_target",
   "initial_panel_review_target",
+  "resumed_panel_review_target",
+]) {
+  assert(deadlineKeys.has(key), `missing required case deadline policy: ${key}`);
+}
+for (const obsolete of [
   "agency_preliminary_response",
   "urgent_agency_preliminary_response",
   "agency_final_status",
+  "urgent_agency_final_status",
 ]) {
-  assert(deadlineKeys.has(key), `missing required deadline policy: ${key}`);
+  assert(
+    !deadlineKeys.has(obsolete),
+    `agency accountability clock must be referral-specific, not case-wide: ${obsolete}`,
+  );
+}
+
+const referralPolicies = new Map(
+  (manifest.referralPolicies ?? []).map((policy) => [policy.key, policy]),
+);
+assert(
+  referralPolicies.size === 2,
+  "SIG must define exactly routine and urgent agency referral policies",
+);
+
+const routineReferral = referralPolicies.get("sig_routine_agency_referral");
+const urgentReferral = referralPolicies.get("sig_urgent_agency_referral");
+assert(routineReferral, "routine agency referral policy is required");
+assert(urgentReferral, "urgent agency referral policy is required");
+
+const deadlineByKey = (policy) =>
+  new Map(
+    policy.definition.deadlinePolicies.map((deadline) => [
+      deadline.key,
+      deadline,
+    ]),
+  );
+
+const routineDeadlines = deadlineByKey(routineReferral);
+const routinePreliminary = routineDeadlines.get("agency_preliminary_response");
+const routineFinal = routineDeadlines.get("agency_final_status");
+assert(
+  routinePreliminary?.trigger === "sent" &&
+    routinePreliminary?.duration?.value === 30 &&
+    routinePreliminary?.duration?.unit === "calendar_days",
+  "routine preliminary agency response must be a per-referral 30-calendar-day clock from send",
+);
+assert(
+  routineFinal?.trigger === "sent" &&
+    routineFinal?.duration?.value === 90 &&
+    routineFinal?.duration?.unit === "calendar_days" &&
+    routineFinal?.pausable === true,
+  "routine final agency status must be a per-referral 90-calendar-day clock with extension/pause support",
+);
+
+const urgentDeadlines = deadlineByKey(urgentReferral);
+const urgentPreliminary = urgentDeadlines.get(
+  "urgent_agency_preliminary_response",
+);
+const urgentFinal = urgentDeadlines.get("urgent_agency_final_status");
+assert(
+  urgentPreliminary?.trigger === "sent" &&
+    urgentPreliminary?.duration?.value === 72 &&
+    urgentPreliminary?.duration?.unit === "hours",
+  "urgent preliminary agency response must be a per-referral 72-hour clock from send",
+);
+assert(
+  urgentFinal?.trigger === "sent" &&
+    urgentFinal?.duration?.value === 90 &&
+    urgentFinal?.duration?.unit === "calendar_days" &&
+    urgentFinal?.pausable === true,
+  "urgent final agency status must be a per-referral 90-calendar-day clock",
+);
+
+for (const deadline of [
+  routinePreliminary,
+  routineFinal,
+  urgentPreliminary,
+  urgentFinal,
+]) {
+  assert(
+    deadline?.escalation?.queueSlug === "oversight_compliance",
+    "each agency referral clock must escalate to oversight_compliance",
+  );
+}
+
+const transitionByKey = new Map(
+  workflow.definition.transitions.map((transition) => [
+    transition.key,
+    transition,
+  ]),
+);
+const beginRoutine = transitionByKey.get("begin_agency_coordination");
+const beginUrgent = transitionByKey.get(
+  "begin_urgent_agency_coordination",
+);
+const resolveAgency = transitionByKey.get(
+  "resolve_after_agency_coordination",
+);
+for (const transition of [beginRoutine, beginUrgent]) {
+  assert(
+    transition?.guards?.referrals?.minCount === 1 &&
+      transition?.guards?.referrals?.requireAllFinal === false,
+    "entering agency coordination must require at least one actual referral",
+  );
+  assert(
+    transition?.requiredPermissions?.includes("referral:manage"),
+    "agency coordination transition must require referral management permission",
+  );
+}
+assert(
+  resolveAgency?.guards?.referrals?.minCount === 1 &&
+    resolveAgency?.guards?.referrals?.requireAllFinal === true,
+  "agency coordination cannot resolve while any referral remains open",
+);
+
+const referralViewRoles = [
+  "sig_triage_officer",
+  "sig_expert_reviewer",
+  "sig_case_officer",
+  "sig_agency_liaison",
+  "sig_supervisor",
+  "sig_oversight_auditor",
+];
+for (const key of referralViewRoles) {
+  assert(
+    roleByKey.get(key)?.permissions.includes("referral:view"),
+    `${key} must be able to view agency referrals`,
+  );
+}
+for (const key of [
+  "sig_case_officer",
+  "sig_agency_liaison",
+  "sig_supervisor",
+]) {
+  assert(
+    roleByKey.get(key)?.permissions.includes("referral:manage"),
+    `${key} must be able to manage agency referrals`,
+  );
+}
+for (const key of [
+  "sig_triage_officer",
+  "sig_expert_reviewer",
+  "sig_oversight_auditor",
+  "sig_intake_privacy_officer",
+  "sig_privacy_officer",
+]) {
+  assert(
+    !roleByKey.get(key)?.permissions.includes("referral:manage"),
+    `${key} must not receive referral management permission`,
+  );
 }
 
 assert(
