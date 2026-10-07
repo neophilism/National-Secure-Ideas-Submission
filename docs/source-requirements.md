@@ -31,28 +31,25 @@ This file records what the downstream application currently implements, what is 
 | Anonymous submissions still reviewed on content alone | SOP §4.2.3 | Identity fields are conditionally unavailable in fully anonymous mode while the content submission remains valid |
 | Confidential submitters may state an agency-disclosure preference | SOP §4.2.3 | Protected `confidential_disclosure_preference` field |
 | Open submitters may consent to agency disclosure and/or direct evaluator contact | SOP §4.2.3 | Protected `open_identity_scope` field |
+| Every submission has a unique tracking identifier | Charter §5.03; SOP §§4.2, 4.3 | Engine confirmation/tracking code plus case number after case creation |
+| Non-account submitters can use a tracking code plus secret/PIN-style credential to check status | SOP §4.2.6 | Engine participant credential: confirmation/tracking code + separately generated 256-bit access secret |
+| Submitters can receive bounded status such as under review / referred / closed | Act §5(6); SOP §4.2.6 | Participant portal exposes bounded case status and workflow-state label only |
+| Fully anonymous submitters cannot receive direct follow-up/feedback | SOP §4.2.3 | `identity_mode = fully_anonymous` resolves to status-only participant access; no messages are returned or accepted |
+| Confidential/open submitters can securely communicate with SIG | Act §5(6); SOP §4.2.6 | Conditional secure portal messaging when `identity_mode != fully_anonymous` |
+| SIG may securely request additional information | Act §5(6); SOP §§4.2.6, 4.4 | Participant-visible portal correspondence and participant replies |
+| Sensitive content should not be exposed through ordinary email | SOP §4.2.6 | SIG communication templates direct participants to the protected portal; portal messages remain inside the participant channel |
 
 ## Deliberately not implemented yet
 
-### 1. Protected submitter status and messaging — blocking
-
-The source calls for a secure confirmation and pseudonymous tracking number, account or tracking-code status lookup, secure messages, and the ability to request additional information without exposing sensitive content in ordinary email.
-
-The engine currently returns a confirmation code and the case system provides case numbers, but it does not provide a protected public status/messaging portal keyed by an external participant credential.
-
-**Current behavior:** PR 2 can securely collect confidential identity/contact information, but the public confirmation text still warns that protected status lookup and secure submitter messaging are not yet enabled. Existing participant communication templates remain definitions only; they do not imply a public portal exists.
-
-**Required next step:** add a generic upstream external-participant portal or high-entropy tracking credential with protected case-status and message access, then consume it here.
-
-### 2. Public supporting-file intake and malware quarantine — blocking
+### 1. Public supporting-file intake and malware quarantine — blocking
 
 The source contemplates technical drawings and supporting files and requires malware scanning/sandboxing. The engine has staff document handling and malware status controls, but the generic public form does not currently enable secure public attachment persistence.
 
-**Current behavior:** supporting-material document types are declared for staff-side handling; the public form contains no file field.
+**Current behavior:** supporting-material document types are declared for staff-side handling; the public form contains no file field and participant messages do not accept attachments.
 
 **Required next step:** add reusable public upload staging, malware quarantine, hash/provenance, and controlled attachment promotion.
 
-### 3. Classified information — deployment/accreditation boundary
+### 2. Classified information — deployment/accreditation boundary
 
 The source permits classified submissions only through approved secure channels and describes cleared personnel, secure facilities, classification handling, HSM-backed encryption, and other high-assurance controls.
 
@@ -62,7 +59,7 @@ The upstream engine explicitly does not constitute an accredited classified syst
 
 **Required before operational classified intake:** an appropriately authorized/accredited environment and integration design. This must not be simulated by ordinary application configuration.
 
-### 4. Parallel multi-panel / multi-agency referral tracking — partially represented
+### 3. Parallel multi-panel / multi-agency referral tracking — partially represented
 
 The source allows submissions to span multiple panels and multiple agencies. The current engine has one active routing queue/assignment and case-level deadline policies; it does not yet provide a first-class collection of parallel referral records, each with its own receiving agency, acknowledgment, 30/90-day clocks, and disposition.
 
@@ -70,17 +67,25 @@ The source allows submissions to span multiple panels and multiple agencies. The
 
 **Candidate reusable upstream improvement:** first-class child referral/work-item records with per-referral deadlines and agency responses.
 
-### 5. Identity verification integrations — procedural/integration work
+### 4. Identity verification integrations — procedural/integration work
 
 The SOP permits confidential identity verification using appropriate public/professional/government sources on a need-to-know basis.
 
-**Current behavior:** PR 2 securely stores supplied identity data and records access, but it does not automatically call identity-verification services or classified/government databases.
+**Current behavior:** protected identity data can be revealed only through the dual-control process, but the application does not automatically call identity-verification services or classified/government databases.
 
 **Future work:** define approved verification adapters, authorization, purpose logging, and deployment-specific provider integrations without exposing protected identity to ordinary reviewers.
 
+### 5. Long-lived participant accounts and credential recovery — optional future enhancement
+
+The SOP describes both account-based access and a non-account tracking-code/PIN path. PR 3 implements the latter. It does not create a long-lived username/password account system, email recovery flow, or 2FA enrollment.
+
+**Current behavior:** the participant must save the tracking/confirmation code and access secret issued at submission. The secret is shown once and cannot be recovered from the database.
+
+**Future work if operationally required:** add generic participant credential rotation/recovery with protections against identity disclosure or account takeover. This is not required to provide the source-described non-account status path.
+
 ## Pseudonymous case identifiers
 
-The source permits participating-agency communications to use a pseudonym **or case number** in place of real identity. The current engine generates stable case numbers and the SIG referral/communication model does not require real-name fields. A separate human-readable random handle generator is therefore not required for PR 2, though it may be added later if useful.
+The source permits participating-agency communications to use a pseudonym **or case number** in place of real identity. The current engine generates stable case numbers and the SIG referral/communication model does not require real-name fields. A separate human-readable random handle generator remains optional.
 
 ## No invented appeal process
 
