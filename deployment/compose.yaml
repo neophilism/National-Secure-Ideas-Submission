@@ -14,7 +14,7 @@ services:
       - sig_postgres:/var/lib/postgresql/data
 
   engine:
-    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.2}
+    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.4}
     depends_on:
       postgres:
         condition: service_healthy
@@ -22,6 +22,8 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER:-sig}:${POSTGRES_PASSWORD:-sig-development-only}@postgres:5432/${POSTGRES_DB:-sig}
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
       AUTH_SESSION_COOKIE_NAME: ${AUTH_SESSION_COOKIE_NAME:-sig_session}
+      PARTICIPANT_SESSION_COOKIE_NAME: ${PARTICIPANT_SESSION_COOKIE_NAME:-sig_participant_session}
+      PARTICIPANT_SESSION_TTL_HOURS: ${PARTICIPANT_SESSION_TTL_HOURS:-8}
       AUTH_LOGIN_FAILURE_LIMIT: ${AUTH_LOGIN_FAILURE_LIMIT:-5}
       AUTH_LOGIN_WINDOW_MINUTES: ${AUTH_LOGIN_WINDOW_MINUTES:-15}
       AUTH_LOGIN_BLOCK_MINUTES: ${AUTH_LOGIN_BLOCK_MINUTES:-15}
@@ -38,7 +40,7 @@ services:
       - ../application:/application:ro
 
   worker:
-    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.2}
+    image: ${ENGINE_IMAGE:-ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.4}
     command: ["npm", "run", "worker"]
     depends_on:
       postgres:
@@ -47,6 +49,8 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER:-sig}:${POSTGRES_PASSWORD:-sig-development-only}@postgres:5432/${POSTGRES_DB:-sig}
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
       AUTH_SESSION_COOKIE_NAME: ${AUTH_SESSION_COOKIE_NAME:-sig_session}
+      PARTICIPANT_SESSION_COOKIE_NAME: ${PARTICIPANT_SESSION_COOKIE_NAME:-sig_participant_session}
+      PARTICIPANT_SESSION_TTL_HOURS: ${PARTICIPANT_SESSION_TTL_HOURS:-8}
       WEBHOOK_ENCRYPTION_KEY: ${WEBHOOK_ENCRYPTION_KEY:-}
       PROTECTED_DATA_ENCRYPTION_KEY: ${PROTECTED_DATA_ENCRYPTION_KEY:-}
 
