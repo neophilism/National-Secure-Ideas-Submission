@@ -15,15 +15,15 @@ This file records what the downstream application currently implements, what is 
 | Expert panels evaluate merit, urgency, and relevance | Act §5(3); SOP §4.4 | Expert-review state, domain panel teams/queues |
 | Domain categories include defense technology, cybersecurity, intelligence/foreign threats, homeland/law enforcement, science/technology, policy/governance | SOP §4.3.6 | Primary domain field, secondary-domain tags, domain-specific review queues |
 | Urgent threats may bypass ordinary layers for rapid referral | SOP §4.3.5 | Urgent queue and urgent referral branch |
-| Triage target of 3 working days | SOP §4.3.10 | 3-business-day case-created deadline |
-| Panel initial review target of 10 business days | SOP §4.4.6 | 10-business-day expert review deadlines |
+| Triage target of 3 working days | SOP §4.3.10 | 3-business-day case-created deadline plus shared triage work view and rolling deadline-compliance metric |
+| Panel initial review target of 10 business days | SOP §4.4.6 | 10-business-day expert review deadline plus shared panel work view and rolling deadline-compliance metric |
 | Panel outcomes include positive referral, awareness/verification referral, hold for more information, merge/duplicate, and no further action | SOP §4.4.7 | Matching workflow transitions/states |
 | Referral to appropriate participating agency with expert findings | Act §5(4); SOP §4.4.8 | Referral preparation followed by first-class recipient-specific agency referrals; one case may carry multiple participating-agency referrals in parallel |
-| Agency preliminary response normally within 30 days | Act/MOU timely-response provisions; FAQ/SOP | Each routine agency referral starts its own 30-calendar-day preliminary-response clock when sent |
-| Urgent agency preliminary response may be required within 72 hours | Act/MOU timely-response provisions | Each urgent agency referral starts its own 72-hour preliminary-response clock when sent |
-| Final disposition/status expected within 90 days, subject to agreed extension | Act/MOU timely-response provisions | Each routine or urgent referral receives its own 90-calendar-day final-status clock; explicit reasoned extensions are recorded against only the affected deadline |
+| Agency preliminary response normally within 30 days | Act/MOU timely-response provisions; FAQ/SOP | Each routine agency referral starts its own 30-calendar-day preliminary-response clock when sent; PR 6 adds aggregate recipient-specific timeliness reporting |
+| Urgent agency preliminary response may be required within 72 hours | Act/MOU timely-response provisions | Each urgent agency referral starts its own 72-hour preliminary-response clock when sent; PR 6 adds aggregate urgent-response timeliness reporting |
+| Final disposition/status expected within 90 days, subject to agreed extension | Act/MOU timely-response provisions | Each routine or urgent referral receives its own 90-calendar-day final-status clock; explicit reasoned extensions are recorded against only the affected deadline; PR 6 reports aggregate final-status timeliness |
 | Lifecycle tracking and auditability | Act §5(5); Charter §5.03 | Engine case history, immutable audit events, deadlines, oversight queue |
-| Preserve inventor patent/trade-secret interests and facilitate licensing/compensation under existing law | Act §6; FAQ | IP-interest intake fields and IP record document type; no payment formula invented |
+| Preserve inventor patent/trade-secret interests and facilitate licensing/compensation under existing law | Act §6; FAQ | IP-interest intake fields, IP record document type, and an explicit IP/proprietary-interest coordination state/queue before an IP-sensitive referral; no ownership, licensing, credit, or payment outcome is invented |
 | Staff oversight of overdue agency responses | Act §9; SOP | Recipient-specific referral deadlines escalate the parent case through the compliance queue while preserving which agency referral is overdue |
 | Fully anonymous, confidential/pseudonymous, and open-with-consent identity choices | SOP §4.2.3 | Required `identity_mode` with the three source-derived choices |
 | Identity package separated from ordinary submission content | Act §7(c); SOP §§4.2.1, 4.2.5 | Identifying/contact fields stored in encrypted `submitter_identity` protected compartment; ordinary reviewers receive no protected-data permission |
@@ -34,8 +34,8 @@ This file records what the downstream application currently implements, what is 
 | Every submission has a unique tracking identifier | Charter §5.03; SOP §§4.2, 4.3 | Engine confirmation/tracking code plus case number after case creation |
 | Non-account submitters can use a tracking code plus secret/PIN-style credential to check status | SOP §4.2.6 | Engine participant credential: confirmation/tracking code + separately generated 256-bit access secret |
 | Submitters can receive bounded status such as under review / referred / closed | Act §5(6); SOP §4.2.6 | Participant portal exposes bounded case status and workflow-state label only |
-| Fully anonymous submitters cannot receive direct follow-up/feedback | SOP §4.2.3 | `identity_mode = fully_anonymous` resolves to status-only participant access; no messages are returned or accepted |
-| Confidential/open submitters can securely communicate with SIG | Act §5(6); SOP §4.2.6 | Conditional secure portal messaging when `identity_mode != fully_anonymous` |
+| Fully anonymous submitters cannot receive direct follow-up/feedback | SOP §4.2.3 | `identity_mode = fully_anonymous` resolves to status-only participant access; no messages are returned or accepted; PR 6 also prevents staff case actions from creating/publishing portal outreach when messaging is unavailable |
+| Confidential/open submitters can securely communicate with SIG | Act §5(6); SOP §4.2.6 | Conditional secure portal messaging when `identity_mode != fully_anonymous`, including a protected-portal closure feedback template |
 | SIG may securely request additional information | Act §5(6); SOP §§4.2.6, 4.4 | Participant-visible portal correspondence and participant replies |
 | Technical drawings and unclassified supporting files may accompany a submission | Act §3; SOP intake/security provisions | Optional `supporting_materials` public file field bound to the supporting-material document type; SHA-256 provenance; immutable submission links; mandatory quarantine; only a recorded clean scan can promote content into case evidence |
 | Sensitive content should not be exposed through ordinary email | SOP §4.2.6 | SIG communication templates direct participants to the protected portal; portal messages remain inside the participant channel |
@@ -87,9 +87,9 @@ panel.
 
 The SOP permits confidential identity verification using appropriate public/professional/government sources on a need-to-know basis.
 
-**Current behavior:** protected identity data can be revealed only through the dual-control process, but the application does not automatically call identity-verification services or classified/government databases.
+**Current behavior:** protected identity data can be revealed only through the dual-control process. PR 6 deliberately does not automatically call identity-verification services or classified/government databases and documents this as an approved-provider deployment boundary.
 
-**Future work:** define approved verification adapters, authorization, purpose logging, and deployment-specific provider integrations without exposing protected identity to ordinary reviewers.
+**Future work:** during deployment acceptance, define any approved verification adapter, authorization/purpose logging, provider-specific access controls, and evidence handling. An adapter must not expose protected identity to ordinary reviewers or bypass dual-control reveal.
 
 ### 5. Long-lived participant accounts and credential recovery — optional future enhancement
 

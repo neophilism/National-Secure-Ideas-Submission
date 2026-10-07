@@ -11,7 +11,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const ENGINE_COMMIT = "6145c3401dcfdd64fa7b8bc1423bf52450aefe98";
+const ENGINE_COMMIT = "539455dc6d61b93ab02c599b1da60c5639e9d1c3";
 
 assert(manifest.schemaVersion === 1, "manifest schemaVersion must be 1");
 assert(
@@ -20,16 +20,16 @@ assert(
 );
 assert(
   lock.engine?.sourceCommit === ENGINE_COMMIT,
-  "engine source pin must match the reviewed parallel-referral engine commit",
+  "engine source pin must match the reviewed operational-profile engine commit",
 );
 assert(
-  lock.engine?.version === "1.0.0-rc.6",
-  "engine version pin must be 1.0.0-rc.6",
+  lock.engine?.version === "1.0.0-rc.7",
+  "engine version pin must be 1.0.0-rc.7",
 );
 assert(
   lock.engine?.image ===
-    "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.6",
-  "engine image pin must be 1.0.0-rc.6",
+    "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.7",
+  "engine image pin must be 1.0.0-rc.7",
 );
 
 const form = manifest.forms?.find(
@@ -391,6 +391,178 @@ for (const key of [
     `${key} must not receive referral management permission`,
   );
 }
+
+const queueBySlug = new Map(
+  manifest.queues.map((queue) => [queue.slug, queue]),
+);
+assert(
+  queueBySlug.get("ip_coordination")?.teamSlug ===
+    "ip_coordination_team",
+  "IP coordination queue/team is required",
+);
+assert(
+  queueBySlug.get("agency_followup")?.name ===
+    "Agency Coordination & Follow-up",
+  "agency follow-up queue must reflect parallel coordination operations",
+);
+
+const ipState = workflow.definition.states.find(
+  (state) => state.key === "ip_coordination",
+);
+assert(ipState, "IP / proprietary-interest coordination state is required");
+
+const prepareIp = transitionByKey.get("prepare_ip_sensitive_referral");
+const completeIp = transitionByKey.get("complete_ip_coordination");
+assert(
+  prepareIp?.from === "expert_review" &&
+    prepareIp?.to === "ip_coordination",
+  "IP-sensitive referral preparation must enter explicit IP coordination",
+);
+assert(
+  prepareIp?.guards?.requiredSubmissionFields?.includes("ip_interest") &&
+    prepareIp?.guards?.requiredSubmissionFields?.includes("ip_notes"),
+  "IP coordination entry must require recorded IP interest and notes",
+);
+assert(
+  completeIp?.from === "ip_coordination" &&
+    completeIp?.to === "referral_preparation",
+  "completed IP coordination must return to referral preparation",
+);
+assert(
+  prepareIp?.actions?.some(
+    (action) =>
+      action.type === "add_tag" && action.value === "ip_interest",
+  ),
+  "IP-sensitive referrals must receive the ip_interest operational tag",
+);
+
+const viewByKey = new Map(
+  (manifest.operationalViews ?? []).map((view) => [view.key, view]),
+);
+for (const key of [
+  "intake_triage_work",
+  "urgent_review_work",
+  "expert_panel_work",
+  "pending_submitter_information",
+  "ip_coordination_work",
+  "referral_preparation_work",
+  "agency_coordination_work",
+  "compliance_escalations",
+  "recent_closures",
+]) {
+  assert(viewByKey.has(key), `missing SIG operational view: ${key}`);
+}
+assert(
+  viewByKey
+    .get("expert_panel_work")
+    ?.definition.queueSlugs?.length === 7,
+  "expert panel view must cover all seven configured panel queues",
+);
+assert(
+  viewByKey.get("compliance_escalations")?.definition.focus ===
+    "overdue" &&
+    viewByKey
+      .get("compliance_escalations")
+      ?.definition.queueSlugs?.includes("oversight_compliance"),
+  "compliance view must show overdue work routed to oversight",
+);
+
+const metricByKey = new Map(
+  (manifest.operationalMetrics ?? []).map((metric) => [
+    metric.key,
+    metric,
+  ]),
+);
+for (const key of [
+  "open_intake_triage",
+  "open_expert_panel",
+  "open_agency_coordination",
+  "open_compliance_escalations",
+  "triage_timeliness",
+  "initial_panel_review_timeliness",
+  "routine_agency_preliminary_timeliness",
+  "urgent_agency_preliminary_timeliness",
+  "agency_final_status_timeliness",
+]) {
+  assert(metricByKey.has(key), `missing SIG operational metric: ${key}`);
+}
+
+const triageMetric = metricByKey.get("triage_timeliness");
+assert(
+  triageMetric?.type === "deadline_compliance" &&
+    triageMetric?.deadlineScope === "case" &&
+    JSON.stringify(triageMetric?.policyKeys) ===
+      JSON.stringify(["triage_target"]),
+  "triage KPI must measure the source-derived triage deadline",
+);
+
+const initialPanelMetric = metricByKey.get(
+  "initial_panel_review_timeliness",
+);
+assert(
+  initialPanelMetric?.type === "deadline_compliance" &&
+    initialPanelMetric?.deadlineScope === "case" &&
+    JSON.stringify(initialPanelMetric?.policyKeys) ===
+      JSON.stringify(["initial_panel_review_target"]),
+  "panel KPI must measure the initial panel review deadline",
+);
+
+const routineAgencyMetric = metricByKey.get(
+  "routine_agency_preliminary_timeliness",
+);
+assert(
+  routineAgencyMetric?.type === "deadline_compliance" &&
+    routineAgencyMetric?.deadlineScope === "referral" &&
+    JSON.stringify(routineAgencyMetric?.policyKeys) ===
+      JSON.stringify(["agency_preliminary_response"]),
+  "routine agency KPI must measure recipient-specific 30-day deadlines",
+);
+
+const urgentAgencyMetric = metricByKey.get(
+  "urgent_agency_preliminary_timeliness",
+);
+assert(
+  urgentAgencyMetric?.type === "deadline_compliance" &&
+    urgentAgencyMetric?.deadlineScope === "referral" &&
+    JSON.stringify(urgentAgencyMetric?.policyKeys) ===
+      JSON.stringify(["urgent_agency_preliminary_response"]),
+  "urgent agency KPI must measure recipient-specific 72-hour deadlines",
+);
+
+const finalAgencyMetric = metricByKey.get(
+  "agency_final_status_timeliness",
+);
+assert(
+  finalAgencyMetric?.type === "deadline_compliance" &&
+    finalAgencyMetric?.deadlineScope === "referral" &&
+    JSON.stringify(finalAgencyMetric?.policyKeys) ===
+      JSON.stringify([
+        "agency_final_status",
+        "urgent_agency_final_status",
+      ]),
+  "final-status KPI must cover routine and urgent recipient-specific 90-day deadlines",
+);
+
+const templateByKey = new Map(
+  manifest.communicationTemplates.map((template) => [
+    template.key,
+    template,
+  ]),
+);
+const closureFeedback = templateByKey.get(
+  "closure_feedback_invitation",
+);
+assert(
+  closureFeedback?.channel === "portal" &&
+    closureFeedback?.defaultVisibility === "participant",
+  "closure feedback must use the protected participant portal",
+);
+assert(
+  String(closureFeedback?.bodyTemplate ?? "").includes(
+    "protected portal",
+  ),
+  "closure feedback template must direct participants to the protected portal",
+);
 
 assert(
   (manifest.reviewPolicies ?? []).length === 0,

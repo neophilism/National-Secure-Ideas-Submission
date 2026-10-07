@@ -338,6 +338,11 @@
     {
       "slug": "oversight_compliance_team",
       "name": "Oversight and Compliance Team"
+    },
+    {
+      "slug": "ip_coordination_team",
+      "name": "Intellectual Property Coordination",
+      "description": "Coordinates patent, trade-secret, licensing, credit, and compensation interests before an IP-sensitive referral package is released."
     }
   ],
   "queues": [
@@ -399,19 +404,28 @@
       "slug": "referral_coordination",
       "name": "Referral Coordination",
       "teamSlug": "referral_coordination_team",
-      "assignmentStrategy": "round_robin"
+      "assignmentStrategy": "round_robin",
+      "description": "Preparation and quality control of participating-agency referral packages before recipient-specific referrals are sent."
     },
     {
       "slug": "agency_followup",
-      "name": "Agency Follow-up",
+      "name": "Agency Coordination & Follow-up",
       "teamSlug": "agency_followup_team",
-      "assignmentStrategy": "round_robin"
+      "assignmentStrategy": "round_robin",
+      "description": "Active recipient-specific agency referrals, acknowledgments, response tracking, extensions, and final-status coordination."
     },
     {
       "slug": "oversight_compliance",
       "name": "Overdue / Compliance Escalation",
       "teamSlug": "oversight_compliance_team",
       "assignmentStrategy": "manual"
+    },
+    {
+      "slug": "ip_coordination",
+      "name": "IP / Proprietary Interest Coordination",
+      "description": "Cases requiring explicit handling of intellectual-property or proprietary interests before referral.",
+      "teamSlug": "ip_coordination_team",
+      "assignmentStrategy": "round_robin"
     }
   ],
   "communicationTemplates": [
@@ -454,6 +468,14 @@
       "subjectTemplate": "SIG case {{case_number}} closed",
       "bodyTemplate": "SIG case {{case_number}} has been closed with status {{case_status}}. Releasable outcome information is available through the protected participant portal.",
       "defaultVisibility": "participant"
+    },
+    {
+      "key": "closure_feedback_invitation",
+      "name": "Closure Feedback Invitation",
+      "channel": "portal",
+      "subjectTemplate": "Feedback on SIG case {{case_number}}",
+      "bodyTemplate": "SIG case {{case_number}} has reached closure. If participant messaging is available for this submission, you may reply through the protected portal with feedback about the handling of the case. Do not send sensitive submission content by ordinary email.",
+      "defaultVisibility": "participant"
     }
   ],
   "workflows": [
@@ -484,6 +506,10 @@
           {
             "key": "pending_submitter_information",
             "label": "Pending Submitter Information"
+          },
+          {
+            "key": "ip_coordination",
+            "label": "IP / Proprietary Interest Coordination"
           },
           {
             "key": "referral_preparation",
@@ -635,6 +661,36 @@
             "comment": "optional"
           },
           {
+            "key": "prepare_ip_sensitive_referral",
+            "label": "Prepare IP-Sensitive Referral",
+            "from": "expert_review",
+            "to": "ip_coordination",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required",
+            "guards": {
+              "requiredCaseFields": [
+                "summary"
+              ],
+              "requiredSubmissionFields": [
+                "ip_interest",
+                "ip_notes"
+              ],
+              "requiredDocuments": []
+            },
+            "actions": [
+              {
+                "type": "add_tag",
+                "value": "ip_interest"
+              },
+              {
+                "type": "add_tag",
+                "value": "referral_candidate"
+              }
+            ]
+          },
+          {
             "key": "prepare_positive_referral",
             "label": "Prepare Positive Referral",
             "from": "expert_review",
@@ -663,6 +719,32 @@
               {
                 "type": "add_tag",
                 "value": "awareness_referral"
+              }
+            ]
+          },
+          {
+            "key": "complete_ip_coordination",
+            "label": "Complete IP Coordination",
+            "from": "ip_coordination",
+            "to": "referral_preparation",
+            "requiredPermissions": [
+              "case:update"
+            ],
+            "comment": "required",
+            "guards": {
+              "requiredCaseFields": [
+                "summary"
+              ],
+              "requiredSubmissionFields": [
+                "ip_interest",
+                "ip_notes"
+              ],
+              "requiredDocuments": []
+            },
+            "actions": [
+              {
+                "type": "add_tag",
+                "value": "ip_coordination_complete"
               }
             ]
           },
@@ -1603,6 +1685,23 @@
           }
         ]
       }
+    },
+    {
+      "key": "ip_coordination_route",
+      "name": "IP / Proprietary Interest Coordination",
+      "priority": 290,
+      "targetQueueSlug": "ip_coordination",
+      "definition": {
+        "schemaVersion": 1,
+        "match": "all",
+        "conditions": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "ip_coordination"
+          }
+        ]
+      }
     }
   ],
   "reviewPolicies": [],
@@ -1722,6 +1821,260 @@
           }
         ]
       }
+    }
+  ],
+  "operationalViews": [
+    {
+      "key": "intake_triage_work",
+      "name": "Intake & Triage Work",
+      "description": "New and actively triaged submissions awaiting a screening outcome.",
+      "definition": {
+        "statuses": [
+          "received",
+          "triage"
+        ],
+        "priorities": [],
+        "queueSlugs": [
+          "intake_triage",
+          "urgent_duty"
+        ],
+        "tags": [],
+        "focus": "open",
+        "sort": "priority_desc",
+        "limit": 100
+      }
+    },
+    {
+      "key": "urgent_review_work",
+      "name": "Urgent Review",
+      "description": "Critical cases in the urgent-review branch.",
+      "definition": {
+        "statuses": [
+          "urgent_review"
+        ],
+        "priorities": [
+          "critical"
+        ],
+        "queueSlugs": [
+          "urgent_duty"
+        ],
+        "tags": [],
+        "focus": "open",
+        "sort": "priority_desc",
+        "limit": 100
+      }
+    },
+    {
+      "key": "expert_panel_work",
+      "name": "Expert Panel Review",
+      "description": "Open substantive review work across SIG domain panels.",
+      "definition": {
+        "statuses": [
+          "expert_review"
+        ],
+        "priorities": [],
+        "queueSlugs": [
+          "defense_technology_review",
+          "cybersecurity_review",
+          "intelligence_foreign_threats_review",
+          "homeland_law_enforcement_review",
+          "science_technology_review",
+          "policy_governance_review",
+          "general_multidomain_review"
+        ],
+        "tags": [],
+        "focus": "open",
+        "sort": "priority_desc",
+        "limit": 200
+      }
+    },
+    {
+      "key": "pending_submitter_information",
+      "name": "Pending Submitter Information",
+      "description": "Cases paused for additional information from a participant.",
+      "definition": {
+        "statuses": [
+          "pending_submitter_information"
+        ],
+        "priorities": [],
+        "queueSlugs": [],
+        "tags": [],
+        "focus": "open",
+        "sort": "updated_desc",
+        "limit": 100
+      }
+    },
+    {
+      "key": "ip_coordination_work",
+      "name": "IP / Proprietary Interest Coordination",
+      "description": "Referral candidates receiving explicit intellectual-property or proprietary-interest handling.",
+      "definition": {
+        "statuses": [
+          "ip_coordination"
+        ],
+        "priorities": [],
+        "queueSlugs": [
+          "ip_coordination"
+        ],
+        "tags": [
+          "ip_interest"
+        ],
+        "focus": "open",
+        "sort": "priority_desc",
+        "limit": 100
+      }
+    },
+    {
+      "key": "referral_preparation_work",
+      "name": "Referral Preparation",
+      "description": "Cases undergoing referral-package preparation and quality control.",
+      "definition": {
+        "statuses": [
+          "referral_preparation"
+        ],
+        "priorities": [],
+        "queueSlugs": [
+          "referral_coordination"
+        ],
+        "tags": [],
+        "focus": "open",
+        "sort": "priority_desc",
+        "limit": 100
+      }
+    },
+    {
+      "key": "agency_coordination_work",
+      "name": "Agency Coordination",
+      "description": "Cases with one or more active participating-agency referrals.",
+      "definition": {
+        "statuses": [
+          "agency_coordination"
+        ],
+        "priorities": [],
+        "queueSlugs": [
+          "agency_followup"
+        ],
+        "tags": [],
+        "focus": "open",
+        "sort": "priority_desc",
+        "limit": 200
+      }
+    },
+    {
+      "key": "compliance_escalations",
+      "name": "Overdue Agency / Compliance Escalations",
+      "description": "Open cases routed to oversight because a case or recipient-specific deadline is overdue.",
+      "definition": {
+        "statuses": [],
+        "priorities": [],
+        "queueSlugs": [
+          "oversight_compliance"
+        ],
+        "tags": [],
+        "focus": "overdue",
+        "sort": "priority_desc",
+        "limit": 200
+      }
+    },
+    {
+      "key": "recent_closures",
+      "name": "Recent Closures",
+      "description": "Cases closed during the engine's recent-closure window.",
+      "definition": {
+        "statuses": [],
+        "priorities": [],
+        "queueSlugs": [],
+        "tags": [],
+        "focus": "recently_closed",
+        "sort": "updated_desc",
+        "limit": 100
+      }
+    }
+  ],
+  "operationalMetrics": [
+    {
+      "key": "open_intake_triage",
+      "name": "Open Intake & Triage",
+      "description": "Current workload awaiting or undergoing triage.",
+      "type": "case_count",
+      "viewKey": "intake_triage_work"
+    },
+    {
+      "key": "open_expert_panel",
+      "name": "Open Expert Panel Review",
+      "description": "Current substantive panel workload.",
+      "type": "case_count",
+      "viewKey": "expert_panel_work"
+    },
+    {
+      "key": "open_agency_coordination",
+      "name": "Open Agency Coordination",
+      "description": "Cases with active participating-agency coordination.",
+      "type": "case_count",
+      "viewKey": "agency_coordination_work"
+    },
+    {
+      "key": "open_compliance_escalations",
+      "name": "Open Compliance Escalations",
+      "description": "Currently overdue work routed to the compliance queue.",
+      "type": "case_count",
+      "viewKey": "compliance_escalations"
+    },
+    {
+      "key": "triage_timeliness",
+      "name": "Triage Target Compliance",
+      "description": "On-time performance for the three-business-day triage target.",
+      "type": "deadline_compliance",
+      "policyKeys": [
+        "triage_target"
+      ],
+      "deadlineScope": "case",
+      "windowDays": 365
+    },
+    {
+      "key": "initial_panel_review_timeliness",
+      "name": "Initial Panel Review Target Compliance",
+      "description": "On-time performance for the initial ten-business-day expert-review target.",
+      "type": "deadline_compliance",
+      "policyKeys": [
+        "initial_panel_review_target"
+      ],
+      "deadlineScope": "case",
+      "windowDays": 365
+    },
+    {
+      "key": "routine_agency_preliminary_timeliness",
+      "name": "Routine Agency Preliminary Response Compliance",
+      "description": "On-time performance for recipient-specific 30-day preliminary responses.",
+      "type": "deadline_compliance",
+      "policyKeys": [
+        "agency_preliminary_response"
+      ],
+      "deadlineScope": "referral",
+      "windowDays": 365
+    },
+    {
+      "key": "urgent_agency_preliminary_timeliness",
+      "name": "Urgent Agency Preliminary Response Compliance",
+      "description": "On-time performance for recipient-specific 72-hour urgent responses.",
+      "type": "deadline_compliance",
+      "policyKeys": [
+        "urgent_agency_preliminary_response"
+      ],
+      "deadlineScope": "referral",
+      "windowDays": 365
+    },
+    {
+      "key": "agency_final_status_timeliness",
+      "name": "Agency Final Status Compliance",
+      "description": "On-time performance for recipient-specific 90-day final-status obligations.",
+      "type": "deadline_compliance",
+      "policyKeys": [
+        "agency_final_status",
+        "urgent_agency_final_status"
+      ],
+      "deadlineScope": "referral",
+      "windowDays": 365
     }
   ]
 }
