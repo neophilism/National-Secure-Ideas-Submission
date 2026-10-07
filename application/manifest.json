@@ -38,6 +38,10 @@
       "queue": {
         "singular": "Work Queue",
         "plural": "Work Queues"
+      },
+      "referral": {
+        "singular": "Agency Referral",
+        "plural": "Agency Referrals"
       }
     }
   },
@@ -62,7 +66,8 @@
         "correspondence:view",
         "correspondence:manage",
         "notification:view",
-        "routing:view"
+        "routing:view",
+        "referral:view"
       ]
     },
     {
@@ -82,7 +87,8 @@
         "note:create_internal",
         "correspondence:view",
         "notification:view",
-        "routing:view"
+        "routing:view",
+        "referral:view"
       ]
     },
     {
@@ -106,7 +112,9 @@
         "correspondence:view",
         "correspondence:manage",
         "notification:view",
-        "routing:view"
+        "routing:view",
+        "referral:view",
+        "referral:manage"
       ]
     },
     {
@@ -125,7 +133,9 @@
         "note:create_internal",
         "correspondence:view",
         "correspondence:manage",
-        "notification:view"
+        "notification:view",
+        "referral:view",
+        "referral:manage"
       ]
     },
     {
@@ -189,7 +199,9 @@
         "notification:manage",
         "routing:view",
         "routing:manage",
-        "audit:view"
+        "audit:view",
+        "referral:view",
+        "referral:manage"
       ]
     },
     {
@@ -210,7 +222,8 @@
         "correspondence:view",
         "notification:view",
         "audit:view",
-        "application:view"
+        "application:view",
+        "referral:view"
       ]
     }
   ],
@@ -446,7 +459,7 @@
     {
       "slug": "sig_submission_workflow",
       "name": "SIG Submission Lifecycle",
-      "description": "Unclassified submission lifecycle from receipt through triage, expert review, referral, agency response tracking, resolution, and closure.",
+      "description": "Unclassified submission lifecycle from receipt through triage, expert review, parallel recipient-specific agency referrals, accountability tracking, resolution, and closure.",
       "definition": {
         "schemaVersion": 1,
         "initialState": "received",
@@ -476,16 +489,8 @@
             "label": "Referral Preparation"
           },
           {
-            "key": "referred_to_agency",
-            "label": "Referred to Agency"
-          },
-          {
-            "key": "agency_preliminary_response",
-            "label": "Agency Preliminary Response Received"
-          },
-          {
-            "key": "agency_follow_up",
-            "label": "Agency Follow-up"
+            "key": "agency_coordination",
+            "label": "Agency Coordination"
           },
           {
             "key": "resolved",
@@ -509,6 +514,35 @@
           }
         ],
         "transitions": [
+          {
+            "key": "begin_urgent_agency_coordination",
+            "label": "Begin Urgent Agency Coordination",
+            "from": "urgent_review",
+            "to": "agency_coordination",
+            "requiredPermissions": [
+              "case:update",
+              "referral:manage"
+            ],
+            "comment": "required",
+            "guards": {
+              "referrals": {
+                "minCount": 1,
+                "requireAllFinal": false
+              },
+              "requiredCaseFields": [],
+              "requiredSubmissionFields": [],
+              "requiredDocuments": []
+            },
+            "actions": [
+              {
+                "type": "add_tag",
+                "value": "urgent_referral"
+              },
+              {
+                "type": "mark_open"
+              }
+            ]
+          },
           {
             "key": "begin_triage",
             "label": "Begin Triage",
@@ -580,25 +614,6 @@
             ]
           },
           {
-            "key": "urgent_refer_to_agency",
-            "label": "Urgent Referral to Agency",
-            "from": "urgent_review",
-            "to": "referred_to_agency",
-            "requiredPermissions": [
-              "case:update"
-            ],
-            "comment": "required",
-            "actions": [
-              {
-                "type": "add_tag",
-                "value": "urgent_referral"
-              },
-              {
-                "type": "mark_open"
-              }
-            ]
-          },
-          {
             "key": "panel_request_more_information",
             "label": "Request More Information",
             "from": "expert_review",
@@ -651,6 +666,38 @@
             ]
           },
           {
+            "key": "begin_agency_coordination",
+            "label": "Begin Agency Coordination",
+            "from": "referral_preparation",
+            "to": "agency_coordination",
+            "requiredPermissions": [
+              "case:update",
+              "referral:manage"
+            ],
+            "comment": "required",
+            "guards": {
+              "referrals": {
+                "minCount": 1,
+                "requireAllFinal": false
+              },
+              "requiredCaseFields": [
+                "summary"
+              ],
+              "requiredSubmissionFields": [
+                "submission_kind",
+                "primary_domain",
+                "national_security_relevance"
+              ],
+              "requiredDocuments": []
+            },
+            "actions": [
+              {
+                "type": "add_tag",
+                "value": "agency_referred"
+              }
+            ]
+          },
+          {
             "key": "close_no_action",
             "label": "Close – No Further Action",
             "from": "expert_review",
@@ -689,76 +736,24 @@
             ]
           },
           {
-            "key": "refer_to_agency",
-            "label": "Refer to Participating Agency",
-            "from": "referral_preparation",
-            "to": "referred_to_agency",
+            "key": "resolve_after_agency_coordination",
+            "label": "Resolve After Agency Coordination",
+            "from": "agency_coordination",
+            "to": "resolved",
             "requiredPermissions": [
-              "case:update"
+              "case:update",
+              "referral:manage"
             ],
             "comment": "required",
             "guards": {
-              "requiredCaseFields": [
-                "summary"
-              ],
-              "requiredSubmissionFields": [
-                "submission_kind",
-                "primary_domain",
-                "national_security_relevance"
-              ],
+              "referrals": {
+                "minCount": 1,
+                "requireAllFinal": true
+              },
+              "requiredCaseFields": [],
+              "requiredSubmissionFields": [],
               "requiredDocuments": []
             },
-            "actions": [
-              {
-                "type": "add_tag",
-                "value": "agency_referred"
-              }
-            ]
-          },
-          {
-            "key": "record_preliminary_agency_response",
-            "label": "Record Preliminary Agency Response",
-            "from": "referred_to_agency",
-            "to": "agency_preliminary_response",
-            "requiredPermissions": [
-              "case:update"
-            ],
-            "comment": "required"
-          },
-          {
-            "key": "continue_agency_follow_up",
-            "label": "Continue Agency Follow-up",
-            "from": "agency_preliminary_response",
-            "to": "agency_follow_up",
-            "requiredPermissions": [
-              "case:update"
-            ],
-            "comment": "optional"
-          },
-          {
-            "key": "resolve_from_preliminary",
-            "label": "Resolve from Preliminary Response",
-            "from": "agency_preliminary_response",
-            "to": "resolved",
-            "requiredPermissions": [
-              "case:update"
-            ],
-            "comment": "required",
-            "actions": [
-              {
-                "type": "mark_resolved"
-              }
-            ]
-          },
-          {
-            "key": "record_final_agency_status",
-            "label": "Record Final Agency Status",
-            "from": "agency_follow_up",
-            "to": "resolved",
-            "requiredPermissions": [
-              "case:update"
-            ],
-            "comment": "required",
             "actions": [
               {
                 "type": "mark_resolved"
@@ -859,105 +854,6 @@
               "prepare_awareness_referral",
               "close_no_action",
               "close_duplicate"
-            ],
-            "escalation": {
-              "priority": "high",
-              "queueSlug": "oversight_compliance"
-            }
-          },
-          {
-            "key": "agency_preliminary_response",
-            "label": "Agency Preliminary Response",
-            "description": "Participating agency preliminary assessment or action plan due within 30 days of routine referral.",
-            "trigger": {
-              "type": "transition",
-              "transitionKey": "refer_to_agency"
-            },
-            "duration": {
-              "value": 30,
-              "unit": "calendar_days"
-            },
-            "warningBefore": {
-              "value": 5,
-              "unit": "calendar_days"
-            },
-            "completeOnTransitions": [
-              "record_preliminary_agency_response"
-            ],
-            "escalation": {
-              "priority": "high",
-              "queueSlug": "oversight_compliance"
-            }
-          },
-          {
-            "key": "urgent_agency_preliminary_response",
-            "label": "Urgent Agency Preliminary Response",
-            "description": "Urgent-threat preliminary response target.",
-            "trigger": {
-              "type": "transition",
-              "transitionKey": "urgent_refer_to_agency"
-            },
-            "duration": {
-              "value": 72,
-              "unit": "hours"
-            },
-            "warningBefore": {
-              "value": 24,
-              "unit": "hours"
-            },
-            "completeOnTransitions": [
-              "record_preliminary_agency_response"
-            ],
-            "escalation": {
-              "priority": "critical",
-              "queueSlug": "oversight_compliance"
-            }
-          },
-          {
-            "key": "agency_final_status",
-            "label": "Agency Final Disposition or Status",
-            "description": "Final disposition or substantive status update expected within 90 days of routine referral, subject to agreed extension for complex matters.",
-            "trigger": {
-              "type": "transition",
-              "transitionKey": "refer_to_agency"
-            },
-            "duration": {
-              "value": 90,
-              "unit": "calendar_days"
-            },
-            "warningBefore": {
-              "value": 15,
-              "unit": "calendar_days"
-            },
-            "pausable": true,
-            "completeOnTransitions": [
-              "resolve_from_preliminary",
-              "record_final_agency_status"
-            ],
-            "escalation": {
-              "priority": "high",
-              "queueSlug": "oversight_compliance"
-            }
-          },
-          {
-            "key": "urgent_agency_final_status",
-            "label": "Urgent Agency Final Disposition or Status",
-            "trigger": {
-              "type": "transition",
-              "transitionKey": "urgent_refer_to_agency"
-            },
-            "duration": {
-              "value": 90,
-              "unit": "calendar_days"
-            },
-            "warningBefore": {
-              "value": 15,
-              "unit": "calendar_days"
-            },
-            "pausable": true,
-            "completeOnTransitions": [
-              "resolve_from_preliminary",
-              "record_final_agency_status"
             ],
             "escalation": {
               "priority": "high",
@@ -1692,31 +1588,139 @@
     },
     {
       "key": "agency_followup_route",
-      "name": "Agency Follow-up",
+      "name": "Agency Coordination",
       "priority": 400,
       "targetQueueSlug": "agency_followup",
       "definition": {
         "schemaVersion": 1,
-        "match": "any",
+        "match": "all",
         "conditions": [
           {
             "field": "status",
             "operator": "equals",
-            "value": "referred_to_agency"
-          },
-          {
-            "field": "status",
-            "operator": "equals",
-            "value": "agency_preliminary_response"
-          },
-          {
-            "field": "status",
-            "operator": "equals",
-            "value": "agency_follow_up"
+            "value": "agency_coordination"
           }
         ]
       }
     }
   ],
-  "reviewPolicies": []
+  "reviewPolicies": [],
+  "referralPolicies": [
+    {
+      "key": "sig_routine_agency_referral",
+      "name": "Routine Participating-Agency Referral",
+      "description": "Recipient-specific accountability policy for routine SIG referrals to participating agencies.",
+      "definition": {
+        "schemaVersion": 1,
+        "deadlinePolicies": [
+          {
+            "key": "agency_preliminary_response",
+            "label": "Agency Preliminary Response",
+            "description": "Participating agency preliminary assessment or action plan due within 30 calendar days of this referral.",
+            "trigger": "sent",
+            "duration": {
+              "value": 30,
+              "unit": "calendar_days"
+            },
+            "warningBefore": {
+              "value": 5,
+              "unit": "calendar_days"
+            },
+            "completeOnEvents": [
+              "preliminary_response",
+              "final_response",
+              "completed",
+              "cancelled"
+            ],
+            "escalation": {
+              "priority": "high",
+              "queueSlug": "oversight_compliance"
+            }
+          },
+          {
+            "key": "agency_final_status",
+            "label": "Agency Final Disposition or Status",
+            "description": "Final disposition or substantive status update expected within 90 calendar days of this referral, subject to a recorded agreed extension.",
+            "trigger": "sent",
+            "duration": {
+              "value": 90,
+              "unit": "calendar_days"
+            },
+            "warningBefore": {
+              "value": 15,
+              "unit": "calendar_days"
+            },
+            "pausable": true,
+            "completeOnEvents": [
+              "final_response",
+              "completed",
+              "cancelled"
+            ],
+            "escalation": {
+              "priority": "high",
+              "queueSlug": "oversight_compliance"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "sig_urgent_agency_referral",
+      "name": "Urgent Participating-Agency Referral",
+      "description": "Recipient-specific accountability policy for urgent-threat SIG referrals.",
+      "definition": {
+        "schemaVersion": 1,
+        "deadlinePolicies": [
+          {
+            "key": "urgent_agency_preliminary_response",
+            "label": "Urgent Agency Preliminary Response",
+            "description": "Urgent-threat preliminary response target for this specific referral.",
+            "trigger": "sent",
+            "duration": {
+              "value": 72,
+              "unit": "hours"
+            },
+            "warningBefore": {
+              "value": 24,
+              "unit": "hours"
+            },
+            "completeOnEvents": [
+              "preliminary_response",
+              "final_response",
+              "completed",
+              "cancelled"
+            ],
+            "escalation": {
+              "priority": "critical",
+              "queueSlug": "oversight_compliance"
+            }
+          },
+          {
+            "key": "urgent_agency_final_status",
+            "label": "Urgent Agency Final Disposition or Status",
+            "description": "Final disposition or substantive status update expected within 90 calendar days of this urgent referral, subject to a recorded agreed extension.",
+            "trigger": "sent",
+            "duration": {
+              "value": 90,
+              "unit": "calendar_days"
+            },
+            "warningBefore": {
+              "value": 15,
+              "unit": "calendar_days"
+            },
+            "pausable": true,
+            "completeOnEvents": [
+              "final_response",
+              "completed",
+              "cancelled"
+            ],
+            "escalation": {
+              "priority": "high",
+              "queueSlug": "oversight_compliance"
+            }
+          }
+        ]
+      }
+    }
+  ]
 }
