@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "application": "secure_innovation_gateway",
+  "mode": "hold_until_approved_schedule",
+  "automaticDeletionEnabled": false,
+  "legalHoldOverridesDisposition": true,
+  "notes": "No destructive retention automation is authorized by this repository. A records officer must approve a schedule and a future reviewed change before automated disposition is enabled.",
+  "categories": [
+    {
+      "key": "submissions_and_cases",
+      "scope": "submissions, cases, workflow history, reviews, referrals, notes, correspondence",
+      "disposition": "retain",
+      "scheduleAuthority": null
+    },
+    {
+      "key": "protected_identity",
+      "scope": "protected submitter identity compartments and reveal history",
+      "disposition": "retain",
+      "scheduleAuthority": null
+    },
+    {
+      "key": "documents_and_evidence",
+      "scope": "submitted files, clean evidence, derivatives, provenance, custody metadata",
+      "disposition": "retain",
+      "scheduleAuthority": null
+    },
+    {
+      "key": "audit_and_security",
+      "scope": "immutable audit events, access/reveal records, security-relevant operational history",
+      "disposition": "retain",
+      "scheduleAuthority": null
+    },
+    {
+      "key": "participant_credentials",
+      "scope": "hashed participant credentials and participant sessions",
+      "disposition": "retain_until_engine_supported_schedule_is_approved",
+      "scheduleAuthority": null
+    }
+  ]
+}
