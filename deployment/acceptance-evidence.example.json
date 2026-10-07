@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "deploymentId": "REPLACE_WITH_DEPLOYMENT_ID",
+  "reviewedAt": null,
+  "reviewedBy": null,
+  "controls": {
+    "immutable_images": { "status": "pending", "evidence": "" },
+    "secrets_key_custody": { "status": "pending", "evidence": "" },
+    "staff_mfa_idp": { "status": "pending", "evidence": "" },
+    "tls_waf_rate_limit": { "status": "pending", "evidence": "" },
+    "network_egress": { "status": "pending", "evidence": "" },
+    "malware_scanning": { "status": "pending", "evidence": "" },
+    "database_backup_restore": { "status": "pending", "evidence": "" },
+    "document_backup_restore": { "status": "pending", "evidence": "" },
+    "siem_ingestion_alerts": { "status": "pending", "evidence": "" },
+    "penetration_test": { "status": "pending", "evidence": "" },
+    "manual_accessibility": { "status": "pending", "evidence": "" },
+    "records_schedule": { "status": "pending", "evidence": "" },
+    "incident_response": { "status": "pending", "evidence": "" },
+    "classified_boundary": { "status": "pending", "evidence": "" }
+  }
+}

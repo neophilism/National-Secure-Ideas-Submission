@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "application": "secure_innovation_gateway",
+  "productionGoLiveRule": "Every control with gate=true must have status=pass and non-empty evidence in the deployment evidence file.",
+  "controls": [
+    {
+      "id": "immutable_images",
+      "category": "supply_chain",
+      "gate": true,
+      "requirement": "Engine and PostgreSQL production images are pinned by immutable sha256 digest."
+    },
+    {
+      "id": "secrets_key_custody",
+      "category": "secrets",
+      "gate": true,
+      "requirement": "Production secrets come from an approved secrets manager; protected-data key custody, backup, rotation and break-glass procedures are documented."
+    },
+    {
+      "id": "staff_mfa_idp",
+      "category": "identity",
+      "gate": true,
+      "requirement": "Administrative/staff routes are protected by an approved MFA-capable identity/access gateway. The current engine does not provide native MFA/IdP."
+    },
+    {
+      "id": "tls_waf_rate_limit",
+      "category": "edge",
+      "gate": true,
+      "requirement": "TLS termination, WAF/volumetric controls, and trusted proxy header overwrite are verified."
+    },
+    {
+      "id": "network_egress",
+      "category": "network",
+      "gate": true,
+      "requirement": "Database is not publicly reachable and application/worker egress is default-deny except approved DNS/HTTPS destinations; cloud metadata and private networks are blocked."
+    },
+    {
+      "id": "malware_scanning",
+      "category": "content_security",
+      "gate": true,
+      "requirement": "An approved scanner/sandbox is connected and a clean result is required before uploaded content becomes evidence."
+    },
+    {
+      "id": "database_backup_restore",
+      "category": "resilience",
+      "gate": true,
+      "requirement": "Encrypted database backup and restore test completed with approved RPO/RTO."
+    },
+    {
+      "id": "document_backup_restore",
+      "category": "resilience",
+      "gate": true,
+      "requirement": "Encrypted document-store backup and restore test completed with integrity verification."
+    },
+    {
+      "id": "siem_ingestion_alerts",
+      "category": "monitoring",
+      "gate": true,
+      "requirement": "Container/security logs and immutable audit events are ingested into the approved SIEM with alert tests."
+    },
+    {
+      "id": "penetration_test",
+      "category": "security_testing",
+      "gate": true,
+      "requirement": "Authorized penetration test completed; no unresolved critical/high finding is accepted for go-live."
+    },
+    {
+      "id": "manual_accessibility",
+      "category": "accessibility",
+      "gate": true,
+      "requirement": "Manual end-to-end accessibility review completed against the production thin application, targeting WCAG 2.1 AA."
+    },
+    {
+      "id": "records_schedule",
+      "category": "records",
+      "gate": true,
+      "requirement": "Records officer approved retention/disposition schedule or explicitly approved hold-by-default mode for launch."
+    },
+    {
+      "id": "incident_response",
+      "category": "operations",
+      "gate": true,
+      "requirement": "Incident response contacts, credential/key compromise procedures, evidence preservation, and notification paths are exercised."
+    },
+    {
+      "id": "classified_boundary",
+      "category": "authorization",
+      "gate": true,
+      "requirement": "Deployment owner acknowledges that this application is unclassified-only and is not an accredited classified system or substitute for an ATO."
+    }
+  ]
+}

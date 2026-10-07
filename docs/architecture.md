@@ -20,9 +20,12 @@ The upstream engine remains domain-neutral. This repository owns:
 
 ## Engine pin
 
-PR 6 is developed against the exact upstream source commit recorded in `engine.lock.json` and targets the matching `1.0.0-rc.7` image.
+The application pins the exact merged rc.7 upstream source commit recorded in
+`engine.lock.json`.
 
-The deployment should move to an immutable image digest once the release image is published.
+Development may use the reviewed rc.7 tag. Production acceptance requires the
+published engine image to be pinned by immutable SHA-256 digest, along with an
+immutable PostgreSQL image digest.
 
 ## Protected submitter identity
 
@@ -237,6 +240,51 @@ deployment and may receive identity material only after the existing protected
 identity reveal process establishes a documented need-to-know and independent
 approval. Provider purpose, authorization, and access logging belong to the
 deployment/integration design and PR 7 acceptance work.
+
+## Security / deployment acceptance boundary
+
+PR 8 separates repository-verifiable controls from deployment controls that
+require infrastructure and evidence.
+
+The production path uses
+`deployment/compose.production.yaml`, not the local-development Compose file.
+
+Repository-enforced production requirements include:
+
+- HTTPS-only public origin;
+- distinct `__Host-` staff and participant session cookies;
+- immutable engine and PostgreSQL image digests;
+- no bootstrap credentials in the running production service;
+- required protected-data encryption key;
+- distinct webhook key if webhooks are approved;
+- 50 MB SIG aggregate public-upload ceiling;
+- loopback-only host binding for the engine;
+- internal-only PostgreSQL network;
+- dropped Linux capabilities for engine/worker;
+- bounded container log rotation;
+- machine-readable hold-by-default retention with no destructive automation.
+
+External go-live controls are defined in
+`deployment/security-acceptance.json` and require evidence before production:
+
+- MFA-capable staff access gateway / IdP;
+- TLS reverse proxy, WAF and trusted forwarding-header behavior;
+- host/cloud default-deny egress;
+- production malware scanner/sandbox;
+- database and document backup/restore testing;
+- SIEM ingestion and alert validation;
+- authorized penetration testing;
+- manual production accessibility review;
+- records-officer approval;
+- incident-response exercise;
+- explicit acknowledgment of the unclassified-only boundary.
+
+The engine does not currently claim native staff SSO/MFA. Staff routes therefore
+require an approved access gateway in production. Public intake and participant
+access remain separate from staff identity federation.
+
+The real deployment environment and completed evidence record are secrets/
+controlled deployment artifacts and are excluded from source control.
 
 ## Security posture
 

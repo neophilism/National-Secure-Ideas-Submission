@@ -6,44 +6,34 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 6 — operational SIG experience**
+**PR 8 — security and deployment acceptance**
 
-PR 6 turns the source-derived workflow into a staff-operable daily workspace
-using the reusable rc.7 application-operations profile.
+PR 8 defines the production go-live contract for the unclassified SIG
+application. It does not claim that source control can issue an ATO, accredit a
+classified system, certify a network, or prove an external control is operating.
 
-SIG now ships shared operational views for intake/triage, urgent review, all
-expert panels, pending submitter information, IP/proprietary-interest
-coordination, referral preparation, agency coordination, overdue compliance
-work, and recent closures. These views appear automatically on the engine's
-Operations page; individual staff may still keep separate personal saved views.
+The repository now includes:
 
-The Operations page also exposes objective aggregate measures backed by
-authoritative case/deadline records:
+- a separate production Compose definition with loopback-only web exposure,
+  internal-only database networking, dropped application capabilities and
+  bounded container logs;
+- a production environment contract requiring HTTPS, `__Host-` session
+  cookies, immutable image digests and protected-data key custody;
+- a machine-enforced production preflight;
+- a go-live control catalog and evidence template covering staff MFA/IdP,
+  reverse proxy/WAF, external egress firewalling, malware scanning, backup and
+  restore, SIEM, penetration testing, manual accessibility, records retention,
+  incident response and the unclassified-only boundary;
+- a hold-by-default records-retention configuration with no automatic
+  destructive disposition;
+- a production deployment/upgrade/recovery runbook.
 
-- current intake/triage workload;
-- current expert-panel workload;
-- current agency-coordination workload;
-- current compliance-escalation workload;
-- three-business-day triage timeliness;
-- ten-business-day initial panel-review timeliness;
-- recipient-specific 30-day routine agency preliminary-response timeliness;
-- recipient-specific 72-hour urgent-response timeliness;
-- recipient-specific 90-day final-status timeliness.
+The current engine does not claim native staff MFA/IdP. Production staff routes
+therefore require an approved MFA-capable access gateway until reusable native
+federation is implemented upstream.
 
-Cases with patent, trade-secret, or other proprietary interests can take an
-explicit **IP / Proprietary Interest Coordination** step before referral
-preparation. The step records an operational tag and routes the case to a
-dedicated coordination queue without inventing ownership, licensing, credit, or
-compensation outcomes.
-
-Closure feedback uses a protected-portal template. The rc.7 engine derives
-participant-contact eligibility from the immutable intake policy, so staff
-cannot create or publish portal correspondence for fully anonymous/status-only
-submissions.
-
-No external identity-verification provider is wired by this PR. Any such
-integration must be separately approved and must consume protected identity only
-after the existing need-to-know dual-control reveal process.
+Passing the repository preflight confirms the declared configuration and
+evidence gates. It is not an ATO or classified-system accreditation.
 
 ## Security boundary
 
@@ -105,7 +95,7 @@ The engine release image must be published before the default Compose deployment
    docker compose --env-file deployment/.env -f deployment/compose.yaml up -d postgres
    ```
 
-7. Run engine migrations. Upgrading to PR 5 applies the referral-ledger migration as part of the normal migration chain:
+7. Run engine migrations. The normal migration chain applies all engine migrations required by the pinned rc.7 release:
 
    ```bash
    docker compose --env-file deployment/.env -f deployment/compose.yaml run --rm engine npm run db:migrate
@@ -136,6 +126,31 @@ The engine release image must be published before the default Compose deployment
    ```
 
 The public participant login surface is under the engine's `/participant` path and uses the SIG organization slug plus the saved tracking/confirmation code and participant access secret.
+
+## Production deployment
+
+Do not use the local-development Compose file as the production security
+baseline.
+
+Production operators should use:
+
+- [Security and deployment acceptance](docs/security-deployment-acceptance.md)
+- [Production deployment runbook](docs/deployment-runbook.md)
+- `deployment/compose.production.yaml`
+- `deployment/production.env.example`
+- `deployment/security-acceptance.json`
+- `deployment/records-retention.json`
+
+A real production environment must pass:
+
+```bash
+node scripts/verify-production-deployment.mjs \
+  --env /secure/runtime/sig.env \
+  --evidence /secure/runtime/acceptance-evidence.json
+```
+
+The evidence file and rendered production secrets must remain outside source
+control.
 
 ## Development sequence
 
