@@ -81,7 +81,19 @@ Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 27.
 - add protected-portal closure feedback copy;
 - preserve identity verification as an approved-provider/deployment integration boundary rather than inventing a provider or exposing protected identity.
 
-## PR 7 — Security/deployment acceptance
+## PR 7 — PR 6 post-merge rc.7 pin cleanup
+
+PR 6 merged immediately before upstream engine PR 27, so its reviewed rc.7 source
+pin still referenced the PR head commit. The merged engine commit has the exact
+same Git tree, so no application behavior changes are required.
+
+- repin `engine.lock.json` to the canonical merged rc.7 engine commit;
+- update downstream CI to validate the merged engine commit rather than the
+  closed PR head;
+- update policy guardrails and README provenance;
+- rerun the complete downstream validation against the merged engine commit.
+
+## PR 8 — Security/deployment acceptance
 
 - production secret handling and key custody;
 - IdP/MFA integration plan;
