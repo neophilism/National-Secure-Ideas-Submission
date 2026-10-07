@@ -95,7 +95,7 @@ The engine release image must be published before the default Compose deployment
    docker compose --env-file deployment/.env -f deployment/compose.yaml up -d postgres
    ```
 
-7. Run engine migrations. Upgrading to PR 5 applies the referral-ledger migration as part of the normal migration chain:
+7. Run engine migrations. The normal migration chain applies all engine migrations required by the pinned rc.7 release:
 
    ```bash
    docker compose --env-file deployment/.env -f deployment/compose.yaml run --rm engine npm run db:migrate
