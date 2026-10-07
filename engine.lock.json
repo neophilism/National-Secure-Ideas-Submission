@@ -1,9 +1,9 @@
 {
   "engine": {
     "repository": "neophilism/Secure-Intake-Case-Workflow-Engine",
-    "sourceCommit": "b8db6155657d7f7576fde72f1dba0563c190c853",
-    "version": "1.0.0-rc.2",
-    "image": "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.2",
+    "sourceCommit": "b7b1f74ed210d68eb61015efc6850167d03721da",
+    "version": "1.0.0-rc.4",
+    "image": "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.4",
     "manifestSchemaVersion": 1
   }
 }
