@@ -20,7 +20,7 @@ The upstream engine remains domain-neutral. This repository owns:
 
 ## Engine pin
 
-PR 5 is developed against the exact upstream source commit recorded in `engine.lock.json` and targets the matching `1.0.0-rc.6` image.
+PR 6 is developed against the exact upstream source commit recorded in `engine.lock.json` and targets the matching `1.0.0-rc.7` image.
 
 The deployment should move to an immutable image digest once the release image is published.
 
@@ -170,6 +170,73 @@ The case may resolve from Agency Coordination only when at least one referral
 exists and every referral is completed or cancelled. Overdue referral clocks
 continue to escalate the parent case through the `oversight_compliance` queue,
 while the referral record identifies which recipient missed the obligation.
+
+## Operational SIG workspace
+
+PR 6 uses the engine's application-defined operations profile rather than
+creating a SIG-only dashboard codebase.
+
+The manifest supplies shared work views for:
+
+- intake and triage;
+- urgent review;
+- expert-panel review across all configured domains;
+- pending submitter information;
+- IP/proprietary-interest coordination;
+- referral preparation;
+- agency coordination;
+- overdue/compliance escalation;
+- recent closures.
+
+Those views are immutable application configuration until a new manifest
+revision is applied. They coexist with personal saved views.
+
+### Objective performance measures
+
+SIG configures case-count and deadline-compliance metrics only. The metrics are
+grounded in current case state or actual deadline due/completion timestamps.
+
+The configured timeliness measures correspond to the existing source-derived
+operational targets: triage, initial panel review, routine/urgent preliminary
+agency responses, and final agency status. Cancelled and actively paused
+deadlines are not treated as failures.
+
+This dashboard is operational reporting, not an assertion that the software
+alone satisfies statutory oversight or annual reporting duties.
+
+## IP / proprietary-interest coordination
+
+The intake already records whether the submission asserts patent/invention,
+trade-secret, other proprietary, or no known IP interests.
+
+For a referral candidate that requires explicit IP handling, staff may move from
+Expert Panel Review to `ip_coordination`. The transition requires the recorded
+IP-interest field and accompanying IP notes, adds the `ip_interest` tag, and
+routes the case to the dedicated IP coordination queue.
+
+Completion returns the case to Referral Preparation. The software does not
+adjudicate title, patentability, trade-secret validity, licensing terms, credit,
+or compensation.
+
+## Participant-safe closure and feedback
+
+Participant-facing closure/feedback correspondence remains a portal operation,
+not ordinary email.
+
+The engine evaluates the source intake's immutable participant-portal condition
+before staff can create or publish portal correspondence. A fully anonymous
+status-only case therefore shows that messaging is unavailable and cannot be
+sent a portal feedback request.
+
+## Identity-verification integration boundary
+
+PR 6 does not select or call an identity-verification provider.
+
+If operations later require verification, an adapter must be approved for the
+deployment and may receive identity material only after the existing protected
+identity reveal process establishes a documented need-to-know and independent
+approval. Provider purpose, authorization, and access logging belong to the
+deployment/integration design and PR 7 acceptance work.
 
 ## Security posture
 
