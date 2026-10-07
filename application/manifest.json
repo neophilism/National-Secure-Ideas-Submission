@@ -406,7 +406,7 @@
       "name": "Submission Acknowledgment",
       "channel": "portal",
       "subjectTemplate": "SIG submission {{case_number}} received",
-      "bodyTemplate": "Your submission has been received and assigned tracking number {{case_number}}. SIG will review it and update the status when a protected submitter communication channel is available.",
+      "bodyTemplate": "Your SIG submission {{case_number}} has been received. Save your participant portal credentials. The protected portal shows case status; secure messages are available when the submission's privacy mode permits messaging.",
       "defaultVisibility": "participant"
     },
     {
@@ -414,7 +414,7 @@
       "name": "Additional Information Request",
       "channel": "portal",
       "subjectTemplate": "Additional information requested for {{case_number}}",
-      "bodyTemplate": "SIG reviewers need additional information concerning {{case_number}}. Please use the protected SIG communication channel to respond.",
+      "bodyTemplate": "SIG reviewers need additional information concerning {{case_number}}. Please respond through the protected participant portal. Do not send sensitive submission content by ordinary email.",
       "defaultVisibility": "participant"
     },
     {
@@ -422,7 +422,7 @@
       "name": "Agency Referral Notice",
       "channel": "portal",
       "subjectTemplate": "Status update for {{case_number}}",
-      "bodyTemplate": "SIG has referred {{case_number}} to an appropriate participating agency for evaluation. SIG remains the point of contact for this submission.",
+      "bodyTemplate": "SIG has referred {{case_number}} to an appropriate participating agency for evaluation. SIG remains the intermediary and point of contact. This update is available through the protected participant portal.",
       "defaultVisibility": "participant"
     },
     {
@@ -430,7 +430,7 @@
       "name": "Agency Preliminary Update",
       "channel": "portal",
       "subjectTemplate": "Agency update for {{case_number}}",
-      "bodyTemplate": "SIG has received a preliminary agency assessment or action plan for {{case_number}}. Any releasable status information will be provided through the protected portal.",
+      "bodyTemplate": "SIG has received a preliminary agency assessment or action plan for {{case_number}}. Releasable status information and any permitted messages are available through the protected participant portal.",
       "defaultVisibility": "participant"
     },
     {
@@ -438,7 +438,7 @@
       "name": "Closure Notice",
       "channel": "portal",
       "subjectTemplate": "SIG case {{case_number}} closed",
-      "bodyTemplate": "SIG case {{case_number}} has been closed with status {{case_status}}. Any releasable outcome information is available through the protected portal.",
+      "bodyTemplate": "SIG case {{case_number}} has been closed with status {{case_status}}. Releasable outcome information is available through the protected participant portal.",
       "defaultVisibility": "participant"
     }
   ],
@@ -972,14 +972,14 @@
     {
       "slug": "secure-idea-submission",
       "name": "Secure Innovation Gateway Submission",
-      "description": "Unclassified SIG intake supporting fully anonymous, confidential/pseudonymous, and open-with-consent identity choices. Protected identity values are stored separately from ordinary submission content.",
+      "description": "Unclassified SIG intake supporting fully anonymous, confidential/pseudonymous, and open-with-consent identity choices, protected status tracking for every submission, and secure messaging for non-anonymous submissions.",
       "accessMode": "public",
       "workflowSlug": "sig_submission_workflow",
       "definition": {
         "schemaVersion": 1,
         "intro": "Use this form only for unclassified information. Choose how SIG should handle your identity, then provide the idea, innovation, vulnerability, operational insight, policy issue, or wrongdoing report for review. Do not include classified information. If information is or may be classified, use an approved secure channel designated by SIG.",
         "submitLabel": "Submit to SIG",
-        "confirmationMessage": "Your unclassified submission has been received. Save the confirmation information shown by the system. Protected public status lookup and secure submitter messaging are not yet enabled in this release.",
+        "confirmationMessage": "Your unclassified submission has been received. Save both the tracking/confirmation code and the participant access secret shown by the system. You will need both to check protected status. Fully anonymous submissions receive status-only access; confidential and open submissions can also use secure portal messaging.",
         "sections": [
           {
             "id": "security_notice",
@@ -1429,7 +1429,16 @@
               }
             ]
           }
-        ]
+        ],
+        "participantPortal": {
+          "enabled": true,
+          "allowMessaging": true,
+          "messagingCondition": {
+            "fieldId": "identity_mode",
+            "operator": "not_equals",
+            "value": "fully_anonymous"
+          }
+        }
       }
     }
   ],
