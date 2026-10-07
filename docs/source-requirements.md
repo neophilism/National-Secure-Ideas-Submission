@@ -18,13 +18,13 @@ This file records what the downstream application currently implements, what is 
 | Triage target of 3 working days | SOP §4.3.10 | 3-business-day case-created deadline |
 | Panel initial review target of 10 business days | SOP §4.4.6 | 10-business-day expert review deadlines |
 | Panel outcomes include positive referral, awareness/verification referral, hold for more information, merge/duplicate, and no further action | SOP §4.4.7 | Matching workflow transitions/states |
-| Referral to appropriate participating agency with expert findings | Act §5(4); SOP §4.4.8 | Referral-preparation and referred states; referral-package document type |
-| Agency preliminary response normally within 30 days | Act/MOU timely-response provisions; FAQ/SOP | 30-calendar-day deadline |
-| Urgent agency preliminary response may be required within 72 hours | Act/MOU timely-response provisions | 72-hour urgent response deadline |
-| Final disposition/status expected within 90 days, subject to agreed extension | Act/MOU timely-response provisions | 90-calendar-day pausable deadline |
+| Referral to appropriate participating agency with expert findings | Act §5(4); SOP §4.4.8 | Referral preparation followed by first-class recipient-specific agency referrals; one case may carry multiple participating-agency referrals in parallel |
+| Agency preliminary response normally within 30 days | Act/MOU timely-response provisions; FAQ/SOP | Each routine agency referral starts its own 30-calendar-day preliminary-response clock when sent |
+| Urgent agency preliminary response may be required within 72 hours | Act/MOU timely-response provisions | Each urgent agency referral starts its own 72-hour preliminary-response clock when sent |
+| Final disposition/status expected within 90 days, subject to agreed extension | Act/MOU timely-response provisions | Each routine or urgent referral receives its own 90-calendar-day final-status clock; explicit reasoned extensions are recorded against only the affected deadline |
 | Lifecycle tracking and auditability | Act §5(5); Charter §5.03 | Engine case history, immutable audit events, deadlines, oversight queue |
 | Preserve inventor patent/trade-secret interests and facilitate licensing/compensation under existing law | Act §6; FAQ | IP-interest intake fields and IP record document type; no payment formula invented |
-| Staff oversight of overdue agency responses | Act §9; SOP | Compliance escalation queue |
+| Staff oversight of overdue agency responses | Act §9; SOP | Recipient-specific referral deadlines escalate the parent case through the compliance queue while preserving which agency referral is overdue |
 | Fully anonymous, confidential/pseudonymous, and open-with-consent identity choices | SOP §4.2.3 | Required `identity_mode` with the three source-derived choices |
 | Identity package separated from ordinary submission content | Act §7(c); SOP §§4.2.1, 4.2.5 | Identifying/contact fields stored in encrypted `submitter_identity` protected compartment; ordinary reviewers receive no protected-data permission |
 | Need-to-know identity access and two-person reveal | SOP §§4.2.8–4.2.9; §4.5 | Dedicated Intake & Privacy requester role, separate Privacy Officer approver role, engine-enforced no-self-approval, expiring one-time reveal, immutable access audit |
@@ -62,13 +62,26 @@ The upstream engine explicitly does not constitute an accredited classified syst
 
 **Required before operational classified intake:** an appropriately authorized/accredited environment and integration design. This must not be simulated by ordinary application configuration.
 
-### 3. Parallel multi-panel / multi-agency referral tracking — partially represented
+### 3. Parallel multi-panel review — partially represented
 
-The source allows submissions to span multiple panels and multiple agencies. The current engine has one active routing queue/assignment and case-level deadline policies; it does not yet provide a first-class collection of parallel referral records, each with its own receiving agency, acknowledgment, 30/90-day clocks, and disposition.
+PR 5 resolves the **multi-agency** portion of this gap. A case can now carry
+multiple participating-agency referrals simultaneously, each with an independent
+recipient, acknowledgment, response history, 30/72-hour/90-day clocks,
+extensions, completion status, and overdue escalation.
 
-**Current behavior:** a primary domain selects the principal panel; secondary domains are recorded. One primary agency referral lifecycle is modeled.
+The remaining limitation concerns **parallel expert-panel work before referral**.
+The form records a primary domain plus secondary domains, but the engine still
+has one active case queue/assignment rather than first-class concurrent panel
+work items.
 
-**Candidate reusable upstream improvement:** first-class child referral/work-item records with per-referral deadlines and agency responses.
+**Current behavior:** one principal expert-review queue handles the case while
+secondary domains remain recorded as submission data. After referral
+preparation, multiple agency referrals are first-class and independent.
+
+**Possible future reusable improvement:** generic parallel review/work-item
+records if SIG operations determine that simultaneous independent panel
+assignments are necessary rather than coordinated review through one primary
+panel.
 
 ### 4. Identity verification integrations — procedural/integration work
 

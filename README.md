@@ -6,29 +6,33 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 4 — public supporting evidence**
+**PR 5 — parallel agency referrals and accountability**
 
-PR 4 enables unclassified supporting-file intake through the reusable rc.5
-public attachment pipeline:
+PR 5 replaces the earlier single-agency case-wide referral path with the
+engine's reusable rc.6 referral ledger.
 
-- submitters may attach technical drawings, diagrams, documents, and images to
-  the ordinary unclassified intake;
-- each file is bound server-side to the SIG supporting-material document type;
-- file-count, MIME, per-file size, and aggregate submission limits are enforced;
-- the engine computes SHA-256 provenance and stores immutable document versions;
-- every public attachment begins in `quarantined / pending` state;
-- quarantined, failed, or infected content is not trusted case evidence;
-- only a recorded clean malware scan can make an attachment available;
-- a clean attachment is promoted into the source case whether scanning completes
-  before or after case creation;
-- file bytes remain outside ordinary submission-answer JSON.
+A SIG case may now contain multiple participating-agency referrals in parallel.
+Each referral records its own recipient, acknowledgment, response history,
+status, and accountability clocks. Routine referrals receive independent
+30-calendar-day preliminary-response and 90-calendar-day final-status clocks.
+Urgent referrals receive independent 72-hour preliminary-response and
+90-calendar-day final-status clocks.
 
-Participant-message attachments remain disabled. Supporting files are accepted
-only through the intake file field added by this milestone.
+An agreed extension is recorded against the specific referral deadline that was
+extended, including the reason and old/new due dates. Missed recipient clocks
+escalate through the existing `oversight_compliance` queue without collapsing
+the other referrals on the case into the same clock.
 
-The existing participant privacy split remains unchanged: fully anonymous
-submissions have protected status-only access, while confidential/pseudonymous
-and open-with-consent submissions may also use secure portal messaging.
+The parent SIG workflow now uses a single **Agency Coordination** state.
+Entering that state requires at least one actual referral. The case cannot move
+from Agency Coordination to Resolved while any referral remains open.
+
+Referral recipients are operational case data rather than a hard-coded agency
+list in the application manifest. This keeps the software usable as participating
+agencies and interagency routing arrangements change.
+
+The existing unclassified-intake, protected-identity, participant-portal, and
+quarantined-supporting-file boundaries remain unchanged.
 
 ## Security boundary
 
@@ -59,9 +63,9 @@ This preserves the source's distinction between anonymous status tracking and di
 
 Pinned engine:
 
-- version: `1.0.0-rc.5`
-- source commit: `f58a5d08f9296318375460ece35e4e4c754f4ff4`
-- target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.5`
+- version: `1.0.0-rc.6`
+- source commit: `6145c3401dcfdd64fa7b8bc1423bf52450aefe98`
+- target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.6`
 - manifest schema: `1`
 
 See `engine.lock.json`.
@@ -90,7 +94,7 @@ The engine release image must be published before the default Compose deployment
    docker compose --env-file deployment/.env -f deployment/compose.yaml up -d postgres
    ```
 
-7. Run engine migrations. Upgrading from the PR 2 engine applies the participant-portal migration as part of the normal chain:
+7. Run engine migrations. Upgrading to PR 5 applies the referral-ledger migration as part of the normal migration chain:
 
    ```bash
    docker compose --env-file deployment/.env -f deployment/compose.yaml run --rm engine npm run db:migrate

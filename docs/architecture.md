@@ -20,7 +20,7 @@ The upstream engine remains domain-neutral. This repository owns:
 
 ## Engine pin
 
-PR 4 is developed against the exact upstream source commit recorded in `engine.lock.json` and targets the matching `1.0.0-rc.5` image.
+PR 5 is developed against the exact upstream source commit recorded in `engine.lock.json` and targets the matching `1.0.0-rc.6` image.
 
 The deployment should move to an immutable image digest once the release image is published.
 
@@ -120,6 +120,56 @@ binary file content is not placed in ordinary answer JSON.
 This milestone does not enable participant-message attachments. It also does
 not change the unclassified-only boundary: the supporting-material help text
 and the existing submission attestation both prohibit classified information.
+
+## Parallel agency referral ledger
+
+Agency referral is no longer modeled as one case-wide recipient lifecycle.
+
+The parent case enters `agency_coordination` after staff have created at least
+one recipient-specific referral. Each referral stores:
+
+- the participating-agency name and optional stable recipient key;
+- the routine or urgent policy snapshot that applied when the referral was
+  created;
+- sent and acknowledgment timestamps;
+- preliminary, status, and final response events;
+- its own deadline rows and deadline history;
+- any reasoned extension recorded against its own clock.
+
+The manifest defines two application policies:
+
+```text
+sig_routine_agency_referral
+  preliminary response: 30 calendar days from send
+  final disposition/status: 90 calendar days from send
+
+sig_urgent_agency_referral
+  preliminary response: 72 hours from send
+  final disposition/status: 90 calendar days from send
+```
+
+Every one of those clocks belongs to the individual referral. Two agencies
+referred on the same day receive separate deadline records even though the
+policy keys are identical.
+
+A preliminary response satisfies only that referral's preliminary-response
+clock. A final response, completion, or cancellation satisfies the applicable
+remaining clocks for that referral. An agreed extension moves only the selected
+deadline and records the reason, prior due date, and new due date.
+
+The old case-wide `referred_to_agency`, `agency_preliminary_response`, and
+`agency_follow_up` states and their case-wide 30/72-hour/90-day deadline
+policies are removed.
+
+SIG does not hard-code a fixed federal-agency directory into the portable
+manifest. Recipient identity is operational referral data so authorized staff
+can route to the appropriate participating agency without requiring a software
+release when participation changes.
+
+The case may resolve from Agency Coordination only when at least one referral
+exists and every referral is completed or cancelled. Overdue referral clocks
+continue to escalate the parent case through the `oversight_compliance` queue,
+while the referral record identifies which recipient missed the obligation.
 
 ## Security posture
 

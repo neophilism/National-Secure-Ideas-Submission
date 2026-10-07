@@ -55,13 +55,18 @@ Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 25.
 
 ## PR 5 — Referral ledger and agency accountability
 
-If implemented upstream as a reusable primitive, add first-class agency referral work items so one SIG case can:
+Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 26.
 
-- refer to multiple agencies in parallel;
-- track each agency acknowledgment;
-- maintain separate 30/90-day clocks;
-- record extensions and response history;
-- escalate per-agency non-compliance.
+- update the engine pin to `1.0.0-rc.6`;
+- replace the single-agency case states with one Agency Coordination state;
+- create routine and urgent referral policies rather than case-wide agency clocks;
+- permit multiple participating-agency referrals on one SIG case in parallel;
+- track acknowledgment and response history independently for every recipient;
+- maintain independent 30/90-day routine clocks and 72-hour/90-day urgent clocks;
+- record reasoned extensions against only the affected referral deadline;
+- escalate overdue recipient clocks through `oversight_compliance`;
+- require at least one referral before entering Agency Coordination;
+- prevent case resolution until every referral is completed or cancelled.
 
 ## PR 6 — Operational SIG experience
 
