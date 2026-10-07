@@ -11,7 +11,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const ENGINE_COMMIT = "825d2ad4b177403739312570f4d44ace76a14287";
+const ENGINE_COMMIT = "58bc74262266a85b1212ae6d2fad4d7abad319c2";
 
 assert(manifest.schemaVersion === 1, "manifest schemaVersion must be 1");
 assert(
