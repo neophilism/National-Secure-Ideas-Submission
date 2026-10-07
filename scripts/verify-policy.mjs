@@ -370,6 +370,7 @@ for (const key of referralViewRoles) {
   );
 }
 for (const key of [
+  "sig_triage_officer",
   "sig_case_officer",
   "sig_agency_liaison",
   "sig_supervisor",
@@ -380,7 +381,6 @@ for (const key of [
   );
 }
 for (const key of [
-  "sig_triage_officer",
   "sig_expert_reviewer",
   "sig_oversight_auditor",
   "sig_intake_privacy_officer",
