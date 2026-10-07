@@ -176,7 +176,8 @@ Docker network segmentation does not replace the external egress firewall.
 
 Public supporting files enter `quarantined / pending`.
 
-A production scanner/sandbox must:
+Engine rc.8 automatically queues every new document version for its configured
+HTTPS scanner. A production scanner/sandbox must:
 
 - inspect actual content, not trust browser MIME metadata;
 - run before a file can be marked clean;
@@ -205,9 +206,10 @@ Before production:
 - verify protected identity can still be decrypted with recovered key custody;
 - record restore duration and resulting RPO/RTO evidence.
 
-For a filesystem-backed document store, take coordinated backups during a
-write-frozen maintenance window or use an infrastructure snapshot design that
-provides equivalent consistency.
+SIG production now targets a private S3-compatible object store through engine
+rc.8 rather than a container filesystem. The backup design must include the
+bucket/object history or an independent encrypted copy and must prove that
+representative object bytes restore with their recorded SHA-256 values.
 
 A backup is not accepted merely because a scheduled job reports success.
 
