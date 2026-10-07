@@ -11,7 +11,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const ENGINE_COMMIT = "b8db6155657d7f7576fde72f1dba0563c190c853";
+const ENGINE_COMMIT = "b7b1f74ed210d68eb61015efc6850167d03721da";
 
 assert(manifest.schemaVersion === 1, "manifest schemaVersion must be 1");
 assert(
@@ -23,13 +23,13 @@ assert(
   "engine source pin must match the merged protected-data engine commit",
 );
 assert(
-  lock.engine?.version === "1.0.0-rc.2",
-  "engine version pin must be 1.0.0-rc.2",
+  lock.engine?.version === "1.0.0-rc.4",
+  "engine version pin must be 1.0.0-rc.4",
 );
 assert(
   lock.engine?.image ===
-    "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.2",
-  "engine image pin must be 1.0.0-rc.2",
+    "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.4",
+  "engine image pin must be 1.0.0-rc.4",
 );
 
 const form = manifest.forms?.find(
@@ -114,6 +114,24 @@ assert(
   byId.get("anonymous_mode_acknowledgment")?.condition?.value ===
     "fully_anonymous",
   "anonymous-mode acknowledgment must be limited to fully anonymous mode",
+);
+
+
+const portal = form.definition.participantPortal;
+assert(portal?.enabled === true, "participant portal must be enabled");
+assert(
+  portal?.allowMessaging === true,
+  "participant portal must permit conditional secure messaging",
+);
+assert(
+  portal?.messagingCondition?.fieldId === "identity_mode" &&
+    portal?.messagingCondition?.operator === "not_equals" &&
+    portal?.messagingCondition?.value === "fully_anonymous",
+  "participant messaging must be disabled exactly for fully anonymous submissions",
+);
+assert(
+  !byId.get("identity_mode")?.protection,
+  "identity_mode must remain ordinary data so portal authorization never decrypts protected identity",
 );
 
 const fileFields = fields.filter((field) => field.type === "file");
