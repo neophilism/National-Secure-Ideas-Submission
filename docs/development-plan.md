@@ -199,6 +199,24 @@ Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 30.
 - keep stateful workflow, scanner, MFA, backup, penetration and accessibility
   tests as separate acceptance activities.
 
+## PR 15 — Land production deployment stack on main
+
+SIG PRs 11 through 14 were merged into their already-merged parent feature
+branches during a rapid stacked merge sequence, so GitHub recorded them as
+merged without propagating their cumulative changes to `main`.
+
+This consolidation PR lands the already-reviewed cumulative result directly on
+current SIG `main`:
+
+- generated Render web + worker + PostgreSQL Blueprint;
+- rc.9 database-backed readiness routing;
+- release-evidence-driven immutable container promotion;
+- live read-only production smoke evidence workflow;
+- associated deployment/runbook/architecture updates.
+
+It also pins validation to the reviewed main-targeted engine PR 31 head that
+lands the orphaned engine PR 30 release-evidence work.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
