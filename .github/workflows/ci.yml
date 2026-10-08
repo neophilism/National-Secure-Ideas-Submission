@@ -55,3 +55,22 @@ jobs:
           --env-file deployment/production.env.example
           -f deployment/compose.production.yaml
           config
+
+      - name: Generate and validate Render production Blueprint
+        run: |
+          node scripts/generate-render-blueprint.mjs \
+            --engine-image ghcr.io/neophilism/secure-intake-case-workflow-engine@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
+            --out deployment/render.generated.yaml
+          ruby -e '
+            require "yaml"
+            data = YAML.load_file("deployment/render.generated.yaml")
+            services = data.fetch("services")
+            abort "expected web and worker" unless services.map { |s| s["type"] }.sort == ["web", "worker"]
+            web = services.find { |s| s["type"] == "web" }
+            worker = services.find { |s| s["type"] == "worker" }
+            abort "worker command missing" unless worker["dockerCommand"] == "npm run worker"
+            abort "migration hook missing" unless web["preDeployCommand"] == "npm run db:migrate"
+            abort "images differ" unless web.dig("image", "url") == worker.dig("image", "url")
+            db = data.fetch("databases").fetch(0)
+            abort "database must block public access" unless db["ipAllowList"] == []
+          '
