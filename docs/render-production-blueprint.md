@@ -18,11 +18,11 @@ services and are supplied as secrets/configuration during Blueprint creation.
 The SIG acceptance contract requires the engine container to be pinned by an
 immutable SHA-256 digest.
 
-A static `render.yaml` that references `:1.0.0-rc.8` would be convenient but
+A static `render.yaml` that references `:1.0.0-rc.9` would be convenient but
 would weaken that requirement because tags can move. The repository therefore
 commits a generator instead of a production Blueprint containing a mutable tag.
 
-Generate the file only after the rc.8 image has been published and its digest
+Generate the file only after the rc.9 image has been published and its digest
 has been independently recorded:
 
 ```bash
@@ -102,7 +102,7 @@ acceptance-evidence file.
 
 After Render billing is enabled:
 
-1. Publish the reviewed rc.8 engine image and record its immutable digest.
+1. Publish the reviewed rc.9 engine image and record its immutable digest.
 2. Generate `deployment/render.generated.yaml`.
 3. Create a Render Blueprint from that file.
 4. Enter the prompted production secrets.
