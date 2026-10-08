@@ -6,19 +6,18 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 18 — automated release-to-production promotion bundle**
+**PR 20 — final acceptance evidence validator**
 
-SIG can now turn the public engine rc.9 GitHub Release evidence into a verified
-deployment bundle without manually transcribing a container digest.
+SIG now has an explicit reviewer-controlled finalization step for production
+acceptance evidence.
 
-The manual **Prepare production promotion bundle** workflow downloads
-`release-evidence.json`, verifies it against `engine.lock.json`, generates
-the immutable Render Blueprint, and emits a promotion record tying the SIG
-commit, engine source commit, release tag, container digest, immutable image and
-Blueprint SHA-256 together.
+The finalizer consumes the machine-generated acceptance draft plus a reviewer
+decision file. It requires a decision for every control and refuses to emit a
+`pass` unless the reviewer supplies a substantive evidence reference.
 
-The resulting Actions artifact contains the release evidence, Render Blueprint,
-promotion evidence and checksums. It contains no production secret values.
+Machine-collected supporting evidence is preserved but remains distinct from the
+reviewer's evidence basis. The resulting file must still pass the production
+preflight before go-live review.
 
 ## Security boundary
 
@@ -50,7 +49,7 @@ This preserves the source's distinction between anonymous status tracking and di
 Pinned engine:
 
 - version: `1.0.0-rc.9`
-- source commit: `788de83a9f00e9bb68c470838b4256fc8f932304`
+- source commit: `2fb452f23e5e5464db03a3ec95d36c4bc2db4fa4`
 - target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.9`
 - manifest schema: `1`
 
@@ -129,6 +128,8 @@ Production operators should use:
 - [Render production Blueprint](docs/render-production-blueprint.md)
 - [Live production smoke evidence](docs/live-production-smoke.md)
 - [Automated production promotion bundle](docs/production-promotion-bundle.md)
+- [Acceptance review package](docs/acceptance-review-package.md)
+- [Final acceptance evidence review](docs/final-acceptance-evidence.md)
 
 A real production environment must pass:
 
