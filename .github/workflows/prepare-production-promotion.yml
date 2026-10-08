@@ -1,6 +1,11 @@
 name: Prepare production promotion bundle
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - production-promotion-request.json
   workflow_dispatch:
     inputs:
       engine_tag:
@@ -25,22 +30,34 @@ jobs:
         with:
           node-version: 22
 
-      - name: Validate requested engine tag
+      - id: request
+        name: Resolve and validate promotion request
         shell: bash
         env:
-          ENGINE_TAG: ${{ inputs.engine_tag }}
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_ENGINE_TAG: ${{ inputs.engine_tag || '' }}
         run: |
           set -euo pipefail
-          locked_version="$(node -p "require('./engine.lock.json').engine.version")"
-          if [ "$ENGINE_TAG" != "v$locked_version" ]; then
-            echo "Requested engine tag $ENGINE_TAG does not match locked version v$locked_version." >&2
-            exit 1
+
+          if [ "$EVENT_NAME" = "push" ]; then
+            node scripts/validate-production-promotion-request.mjs \
+              --file production-promotion-request.json \
+              --github-output "$GITHUB_OUTPUT"
+          else
+            locked_version="$(node -p "require('./engine.lock.json').engine.version")"
+            locked_source="$(node -p "require('./engine.lock.json').engine.sourceCommit")"
+            if [ "$MANUAL_ENGINE_TAG" != "v$locked_version" ]; then
+              echo "Requested engine tag $MANUAL_ENGINE_TAG does not match locked version v$locked_version." >&2
+              exit 1
+            fi
+            echo "engine_tag=$MANUAL_ENGINE_TAG" >> "$GITHUB_OUTPUT"
+            echo "engine_source_commit=$locked_source" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Download public engine release evidence
         shell: bash
         env:
-          ENGINE_TAG: ${{ inputs.engine_tag }}
+          ENGINE_TAG: ${{ steps.request.outputs.engine_tag }}
         run: |
           set -euo pipefail
           url="https://github.com/neophilism/Secure-Intake-Case-Workflow-Engine/releases/download/$ENGINE_TAG/release-evidence.json"
@@ -103,6 +120,6 @@ jobs:
         run: |
           echo "## SIG production promotion bundle" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Engine tag: `${{ inputs.engine_tag }}`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Engine tag: `${{ steps.request.outputs.engine_tag }}`" >> "$GITHUB_STEP_SUMMARY"
           echo "- SIG commit: `$GITHUB_SHA`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Artifact: `sig-production-promotion-${{ github.run_id }}`" >> "$GITHUB_STEP_SUMMARY"
