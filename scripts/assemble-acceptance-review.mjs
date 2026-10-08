@@ -36,7 +36,9 @@ function parseArgs(argv) {
 }
 
 function loadJson(path) {
-  return JSON.parse(readFileSync(resolve(path), "utf8"));
+  const source =
+    typeof path === "string" ? resolve(path) : path;
+  return JSON.parse(readFileSync(source, "utf8"));
 }
 
 const args = parseArgs(process.argv.slice(2));
