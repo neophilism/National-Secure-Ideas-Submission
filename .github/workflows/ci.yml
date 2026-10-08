@@ -96,6 +96,27 @@ jobs:
             abort "database must block public access" unless db["ipAllowList"] == []
           '
 
+      - name: Verify promotion evidence chain
+        run: |
+          node scripts/write-production-promotion-evidence.mjs \
+            --release-evidence /tmp/release-evidence.json \
+            --blueprint deployment/render.generated.yaml \
+            --sig-commit bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb \
+            --out /tmp/production-promotion-evidence.json
+          node -e '
+            const fs = require("fs");
+            const crypto = require("crypto");
+            const report = require("/tmp/production-promotion-evidence.json");
+            const blueprint = fs.readFileSync("deployment/render.generated.yaml");
+            const expected = crypto.createHash("sha256").update(blueprint).digest("hex");
+            if (report.renderBlueprint.sha256 !== expected) process.exit(1);
+            if (!report.engine.immutableImage.endsWith("@sha256:" + "a".repeat(64))) process.exit(1);
+            if (report.sigCommit !== "b".repeat(40)) process.exit(1);
+          '
+          ruby -e 'require "yaml"; YAML.load_file(".github/workflows/prepare-production-promotion.yml")'
+          grep -q 'releases/download/$ENGINE_TAG/release-evidence.json' .github/workflows/prepare-production-promotion.yml
+          grep -q 'sig-production-promotion-' .github/workflows/prepare-production-promotion.yml
+
       - name: Verify live smoke harness contract
         run: |
           node --check scripts/verify-live-deployment.mjs
