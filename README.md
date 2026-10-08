@@ -6,19 +6,25 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 13 — release-evidence-driven production promotion**
+**PR 15 — land production deployment stack on main**
 
-The production Render Blueprint can now be generated directly from the
-engine release workflow's `release-evidence.json` artifact.
+PRs 11–14 were successfully reviewed and merged as a stacked sequence, but
+their parent feature branches had already been merged into `main`. This PR
+lands their cumulative production-enablement result directly on current SIG
+`main`.
 
-Before generating infrastructure, SIG verifies that the release evidence
-matches the downstream engine lock: rc.9 version, exact source commit, Git tag,
-GHCR repository, SHA-256 digest, and immutable image reference.
+The consolidated production path includes:
 
-This removes manual digest transcription from the normal promotion path while
-preserving direct immutable-digest input as a controlled recovery option.
+- generated Render infrastructure for the web service, continuous worker and
+  private PostgreSQL;
+- rc.9 `/api/ready` database-backed routing health;
+- release-evidence verification before immutable container promotion;
+- a read-only live deployment smoke workflow that emits JSON evidence for
+  liveness, readiness, the public unclassified boundary, participant-login
+  availability and production security headers.
 
-The release evidence itself contains no deployment secrets.
+Validation is pinned to the reviewed engine PR 31 head until that
+main-targeted release-evidence repair merges.
 
 ## Security boundary
 
