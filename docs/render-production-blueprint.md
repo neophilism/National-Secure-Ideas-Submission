@@ -50,6 +50,7 @@ image digest changes with release promotion.
 - image-backed Render web service;
 - Virginia region;
 - one initial instance;
+- `/api/ready` database-backed Render health check;
 - managed PostgreSQL connection from Render;
 - `npm run db:migrate` as the pre-deploy migration command;
 - production session/cookie/upload settings;
