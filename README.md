@@ -6,26 +6,18 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 21 — land acceptance stack and release-capable rc.9 pin**
+**PR 22 — automatic production promotion request**
 
-PRs 19 and 20 were reviewed and merged as stacked changes, but their parent
-feature branches had already been merged into `main`. This PR lands their
-cumulative acceptance-review/finalization work directly on current SIG
-`main`.
+The public engine `v1.0.0-rc.9` release is published from the exact source
+commit locked by SIG.
 
-It also advances the locked rc.9 engine source to the merged engine PR 33
-commit, which is the source that will publish `v1.0.0-rc.9` through the new
-one-click validated release workflow.
+SIG now includes a reviewed `production-promotion-request.json`. When that
+request reaches `main`, the existing production-promotion workflow starts
+automatically, validates the request against `engine.lock.json`, downloads the
+public release evidence, generates the immutable Render Blueprint, and uploads
+the verified promotion bundle.
 
-The consolidated result includes:
-
-- acceptance-review package assembly from promotion + live-smoke artifacts;
-- explicit separation of supporting machine evidence from reviewer evidence;
-- zero automatic control promotion;
-- final reviewer-decision validation;
-- rejection of evidence-free `pass` decisions;
-- release provenance aligned with the actual rc.9 source that will be tagged
-  and published.
+Manual workflow dispatch remains available only as a controlled retry path.
 
 ## Security boundary
 
@@ -136,6 +128,7 @@ Production operators should use:
 - [Render production Blueprint](docs/render-production-blueprint.md)
 - [Live production smoke evidence](docs/live-production-smoke.md)
 - [Automated production promotion bundle](docs/production-promotion-bundle.md)
+- [Automatic production promotion request](docs/automatic-production-promotion-request.md)
 - [Acceptance review package](docs/acceptance-review-package.md)
 - [Final acceptance evidence review](docs/final-acceptance-evidence.md)
 
