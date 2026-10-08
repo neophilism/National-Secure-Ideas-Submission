@@ -246,6 +246,25 @@ Operational prerequisite: publish engine `v1.0.0-rc.9` with its public
 - keep actual paid-resource creation and external security acceptance as
   separate deployment steps.
 
+## PR 19 — Acceptance review package assembler
+
+Stacked on the automated promotion bundle and existing live-smoke workflow.
+
+- download a prior production-promotion artifact and live-smoke artifact by
+  GitHub Actions run ID;
+- verify the promotion bundle checksums;
+- require promotion and smoke evidence to reference the same engine release;
+- attach qualifying machine evidence to the relevant control review;
+- keep every production gate in `pending` status until its full external
+  requirement is satisfied;
+- align the immutable-supply-chain control with managed PostgreSQL deployments
+  by accepting provider/resource/version identity instead of requiring a
+  nonexistent managed-database container digest;
+- emit a draft acceptance-evidence file, review summary, original supporting
+  artifacts and package checksums as one review bundle;
+- prove in CI that valid machine evidence still results in zero automatically
+  passed gates.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
