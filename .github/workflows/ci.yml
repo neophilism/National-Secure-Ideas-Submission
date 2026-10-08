@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: neophilism/Secure-Intake-Case-Workflow-Engine
-          ref: e7a79a84c7025a862473b21fc5f36a2c4e5673c9
+          ref: 509b4734a5d65c9716b4a91ea34fa4b3979d9d17
           path: .engine
 
       - name: Install pinned engine dependencies
@@ -55,3 +55,51 @@ jobs:
           --env-file deployment/production.env.example
           -f deployment/compose.production.yaml
           config
+
+      - name: Generate and validate Render production Blueprint
+        run: |
+          node -e '
+            const fs = require("fs");
+            const lock = require("./engine.lock.json").engine;
+            const repository = "ghcr.io/neophilism/secure-intake-case-workflow-engine";
+            const digest = "sha256:" + "a".repeat(64);
+            fs.writeFileSync("/tmp/release-evidence.json", JSON.stringify({
+              schemaVersion: 1,
+              engine: {
+                version: lock.version,
+                sourceCommit: lock.sourceCommit,
+                tag: "v" + lock.version
+              },
+              container: {
+                repository,
+                digest,
+                immutableRef: repository + "@" + digest
+              }
+            }));
+          '
+          node scripts/generate-render-blueprint.mjs \
+            --release-evidence /tmp/release-evidence.json \
+            --out deployment/render.generated.yaml
+          ruby -e '
+            require "yaml"
+            data = YAML.load_file("deployment/render.generated.yaml")
+            services = data.fetch("services")
+            abort "expected web and worker" unless services.map { |s| s["type"] }.sort == ["web", "worker"]
+            web = services.find { |s| s["type"] == "web" }
+            worker = services.find { |s| s["type"] == "worker" }
+            abort "worker command missing" unless worker["dockerCommand"] == "npm run worker"
+            abort "migration hook missing" unless web["preDeployCommand"] == "npm run db:migrate"
+            abort "readiness health check missing" unless web["healthCheckPath"] == "/api/ready"
+            abort "images differ" unless web.dig("image", "url") == worker.dig("image", "url")
+            abort "image is not immutable" unless web.dig("image", "url").include?("@sha256:")
+            db = data.fetch("databases").fetch(0)
+            abort "database must block public access" unless db["ipAllowList"] == []
+          '
+
+      - name: Verify live smoke harness contract
+        run: |
+          node --check scripts/verify-live-deployment.mjs
+          if node scripts/verify-live-deployment.mjs --base-url http://example.invalid; then
+            echo "Smoke harness accepted a non-HTTPS deployment URL." >&2
+            exit 1
+          fi
