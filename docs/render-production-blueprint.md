@@ -22,16 +22,31 @@ A static `render.yaml` that references `:1.0.0-rc.9` would be convenient but
 would weaken that requirement because tags can move. The repository therefore
 commits a generator instead of a production Blueprint containing a mutable tag.
 
-Generate the file only after the rc.9 image has been published and its digest
-has been independently recorded:
+Generate the file from the engine release artifact after the rc.9 image has
+been published:
 
 ```bash
 node scripts/generate-render-blueprint.mjs \
-  --engine-image ghcr.io/neophilism/secure-intake-case-workflow-engine@sha256:<64-hex-digest> \
+  --release-evidence /secure/release-evidence.json \
   --out deployment/render.generated.yaml
 ```
 
-The generator rejects:
+The generator verifies the release artifact against `engine.lock.json` before
+emitting infrastructure:
+
+- release schema version;
+- rc.9 package version;
+- exact pinned engine source commit;
+- `v<version>` tag;
+- expected GHCR repository;
+- SHA-256 digest;
+- internally consistent immutable image reference.
+
+A direct `--engine-image repository@sha256:digest` input remains available for
+controlled recovery/manual promotion, but release-evidence-driven generation is
+the normal production path.
+
+The generator rejects mismatched release provenance as well as:
 
 - non-GHCR engine images;
 - tag-only images;

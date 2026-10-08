@@ -6,34 +6,19 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 9 — production runtime enablement**
+**PR 13 — release-evidence-driven production promotion**
 
-The first production-provisioning attempt exposed two reusable runtime gaps in
-the rc.7 document path: cloud deployments were limited to local filesystem
-document storage, and malware-scan results had to be supplied by an external
-process rather than entering an automatic worker queue.
+The production Render Blueprint can now be generated directly from the
+engine release workflow's `release-evidence.json` artifact.
 
-SIG now targets engine rc.9, which adds S3-compatible durable document storage,
-a generic HTTPS malware-scanner adapter, and automatic `document.scan`
-background jobs for every persisted document version.
+Before generating infrastructure, SIG verifies that the release evidence
+matches the downstream engine lock: rc.9 version, exact source commit, Git tag,
+GHCR repository, SHA-256 digest, and immutable image reference.
 
-The production contract therefore requires:
+This removes manual digest transcription from the normal promotion path while
+preserving direct immutable-digest input as a controlled recovery option.
 
-- `DOCUMENT_STORAGE_DRIVER=s3` and a private S3-compatible bucket;
-- object-store credentials supplied as deployment secrets;
-- an HTTPS malware-scanner endpoint/provider;
-- the continuously running background worker that processes scan jobs.
-
-The trust model remains fail-closed: storage/scanner failure, a missing scanner,
-a failed scan, or a SHA-256 mismatch does not make a document available.
-
-Actual production provisioning is still blocked by external account/provider
-requirements recorded in
-[docs/production-provisioning-status.md](docs/production-provisioning-status.md).
-In particular, the connected Render workspace rejected creation of a paid
-production PostgreSQL instance because billing information is not configured.
-No external acceptance control is marked complete merely because the software
-adapter exists.
+The release evidence itself contains no deployment secrets.
 
 ## Security boundary
 
@@ -65,7 +50,7 @@ This preserves the source's distinction between anonymous status tracking and di
 Pinned engine:
 
 - version: `1.0.0-rc.9`
-- source commit: `757e8c6f3e55419cbf12a877b37f798527323732`
+- source commit: `ec2597e23af3475fd97eb1fce8b6e4eceff8435b`
 - target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.9`
 - manifest schema: `1`
 

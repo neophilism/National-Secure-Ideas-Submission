@@ -170,6 +170,19 @@ Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 29.
 - preserve worker monitoring through process/job/log/SIEM controls rather than
   inventing an HTTP worker health endpoint.
 
+## PR 13 — Release-evidence-driven production promotion
+
+Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 30.
+
+- consume the engine release workflow's machine-readable
+  `release-evidence.json` artifact;
+- verify evidence schema, rc.9 version, exact source commit, release tag,
+  expected GHCR repository, SHA-256 digest and immutable reference against
+  `engine.lock.json`;
+- generate the Render Blueprint from the verified immutable release reference;
+- retain direct digest input only as a controlled manual/recovery path;
+- exercise the complete release-evidence-to-Blueprint promotion path in CI.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
