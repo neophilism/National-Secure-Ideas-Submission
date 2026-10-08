@@ -127,6 +127,7 @@ Production operators should use:
 - `deployment/records-retention.json`
 - [Current provisioning status](docs/production-provisioning-status.md)
 - [Render production Blueprint](docs/render-production-blueprint.md)
+- [Live production smoke evidence](docs/live-production-smoke.md)
 
 A real production environment must pass:
 
