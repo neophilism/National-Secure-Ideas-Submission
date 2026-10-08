@@ -117,6 +117,51 @@ jobs:
           grep -q 'releases/download/$ENGINE_TAG/release-evidence.json' .github/workflows/prepare-production-promotion.yml
           grep -q 'sig-production-promotion-' .github/workflows/prepare-production-promotion.yml
 
+      - name: Verify acceptance review remains evidence-gated
+        run: |
+          node -e '
+            const fs = require("fs");
+            const lock = require("./engine.lock.json").engine;
+            fs.writeFileSync("/tmp/live-deployment-smoke.json", JSON.stringify({
+              schemaVersion: 1,
+              application: "secure_innovation_gateway",
+              baseUrl: "https://sig.example.test",
+              checkedAt: new Date().toISOString(),
+              engine: {
+                version: lock.version,
+                sourceCommit: lock.sourceCommit
+              },
+              checks: [
+                { name: "engine_liveness", status: "pass" },
+                { name: "engine_readiness", status: "pass" },
+                { name: "public_intake_boundary", status: "pass" },
+                { name: "participant_login_surface", status: "pass" },
+                { name: "security_headers", status: "pass" }
+              ],
+              observedHeaders: {}
+            }));
+          '
+          node scripts/assemble-acceptance-review.mjs \
+            --promotion /tmp/production-promotion-evidence.json \
+            --smoke /tmp/live-deployment-smoke.json \
+            --promotion-run-id 12345 \
+            --smoke-run-id 67890 \
+            --deployment-id sig-ci-acceptance \
+            --out-draft /tmp/acceptance-evidence-draft.json \
+            --out-review /tmp/acceptance-review.json
+          node -e '
+            const review = require("/tmp/acceptance-review.json");
+            const draft = require("/tmp/acceptance-evidence-draft.json");
+            if (review.goLiveStatus !== "not_ready") process.exit(1);
+            if (review.summary.passedGates !== 0) process.exit(1);
+            if (review.summary.pendingGates !== review.summary.totalGates) process.exit(1);
+            if (Object.values(draft.controls).some((control) => control.status !== "pending")) process.exit(1);
+            if (!draft.controls.immutable_images.evidence.includes("Supporting evidence only")) process.exit(1);
+          '
+          ruby -e 'require "yaml"; YAML.load_file(".github/workflows/assemble-acceptance-review.yml")'
+          grep -q 'actions/download-artifact@v4' .github/workflows/assemble-acceptance-review.yml
+          grep -q 'Go-live status: \*\*not ready\*\*' .github/workflows/assemble-acceptance-review.yml
+
       - name: Verify live smoke harness contract
         run: |
           node --check scripts/verify-live-deployment.mjs
