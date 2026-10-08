@@ -96,6 +96,25 @@ jobs:
             abort "database must block public access" unless db["ipAllowList"] == []
           '
 
+      - name: Verify automatic promotion request contract
+        run: |
+          node scripts/validate-production-promotion-request.mjs \
+            --file production-promotion-request.json
+          node -e '
+            const fs = require("fs");
+            const request = require("./production-promotion-request.json");
+            request.engineSourceCommit = "a".repeat(40);
+            fs.writeFileSync("/tmp/invalid-promotion-request.json", JSON.stringify(request));
+          '
+          if node scripts/validate-production-promotion-request.mjs \
+            --file /tmp/invalid-promotion-request.json; then
+            echo "Promotion request validator accepted a source SHA that does not match engine.lock.json." >&2
+            exit 1
+          fi
+          ruby -e 'require "yaml"; YAML.load_file(".github/workflows/prepare-production-promotion.yml")'
+          grep -q 'production-promotion-request.json' .github/workflows/prepare-production-promotion.yml
+          grep -q 'steps.request.outputs.engine_tag' .github/workflows/prepare-production-promotion.yml
+
       - name: Verify promotion evidence chain
         run: |
           node scripts/write-production-promotion-evidence.mjs \
