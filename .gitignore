@@ -8,3 +8,4 @@ node_modules/
 deployment/production.env
 deployment/acceptance-evidence.json
 backups/
+deployment/render.generated.yaml
