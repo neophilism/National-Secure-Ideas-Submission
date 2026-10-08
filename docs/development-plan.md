@@ -246,6 +246,41 @@ Operational prerequisite: publish engine `v1.0.0-rc.9` with its public
 - keep actual paid-resource creation and external security acceptance as
   separate deployment steps.
 
+## PR 19 — Acceptance review package assembler
+
+Stacked on the automated promotion bundle and existing live-smoke workflow.
+
+- download a prior production-promotion artifact and live-smoke artifact by
+  GitHub Actions run ID;
+- verify the promotion bundle checksums;
+- require promotion and smoke evidence to reference the same engine release;
+- attach qualifying machine evidence to the relevant control review;
+- keep every production gate in `pending` status until its full external
+  requirement is satisfied;
+- align the immutable-supply-chain control with managed PostgreSQL deployments
+  by accepting provider/resource/version identity instead of requiring a
+  nonexistent managed-database container digest;
+- emit a draft acceptance-evidence file, review summary, original supporting
+  artifacts and package checksums as one review bundle;
+- prove in CI that valid machine evidence still results in zero automatically
+  passed gates.
+
+## PR 20 — Final acceptance evidence validator
+
+Stacked on the acceptance-review package.
+
+- add an explicit reviewer-decision template covering every production control;
+- require deployment ID, exact review timestamp and reviewer identity;
+- accept only `pending` or `pass` decisions;
+- reject any `pass` without a substantive reviewer evidence reference;
+- preserve machine-generated supporting evidence while clearly separating it
+  from reviewer evidence;
+- reject missing/extra controls and deployment/schema mismatches;
+- emit the final `acceptance-evidence.json` only from explicit reviewer
+  decisions;
+- keep the production preflight as the final machine enforcement layer;
+- prove in CI that an evidence-free pass is rejected.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
