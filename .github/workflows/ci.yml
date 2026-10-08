@@ -162,6 +162,50 @@ jobs:
           grep -q 'actions/download-artifact@v4' .github/workflows/assemble-acceptance-review.yml
           grep -q 'Go-live status: \*\*not ready\*\*' .github/workflows/assemble-acceptance-review.yml
 
+      - name: Verify final acceptance evidence review contract
+        run: |
+          node -e '
+            const fs = require("fs");
+            const draft = require("/tmp/acceptance-evidence-draft.json");
+            const controls = {};
+            for (const id of Object.keys(draft.controls)) {
+              controls[id] = {
+                status: "pass",
+                evidence: "CI reviewer evidence reference for " + id
+              };
+            }
+            fs.writeFileSync("/tmp/acceptance-review-decisions.json", JSON.stringify({
+              schemaVersion: 1,
+              deploymentId: draft.deploymentId,
+              reviewedAt: new Date().toISOString(),
+              reviewedBy: "CI reviewer",
+              controls
+            }));
+          '
+          node scripts/finalize-acceptance-evidence.mjs \
+            --draft /tmp/acceptance-evidence-draft.json \
+            --decisions /tmp/acceptance-review-decisions.json \
+            --out /tmp/final-acceptance-evidence.json
+          node -e '
+            const final = require("/tmp/final-acceptance-evidence.json");
+            if (Object.values(final.controls).some((control) => control.status !== "pass")) process.exit(1);
+            if (Object.values(final.controls).some((control) => !control.evidence.includes("Reviewer evidence:"))) process.exit(1);
+          '
+          node -e '
+            const fs = require("fs");
+            const decisions = require("/tmp/acceptance-review-decisions.json");
+            decisions.controls.immutable_images.evidence = "";
+            fs.writeFileSync("/tmp/invalid-acceptance-decisions.json", JSON.stringify(decisions));
+          '
+          if node scripts/finalize-acceptance-evidence.mjs \
+            --draft /tmp/acceptance-evidence-draft.json \
+            --decisions /tmp/invalid-acceptance-decisions.json \
+            --out /tmp/should-not-exist.json; then
+            echo "Finalizer accepted a pass without reviewer evidence." >&2
+            exit 1
+          fi
+          node --check scripts/finalize-acceptance-evidence.mjs
+
       - name: Verify live smoke harness contract
         run: |
           node --check scripts/verify-live-deployment.mjs
