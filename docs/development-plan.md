@@ -156,6 +156,20 @@ the exact same Git tree, so no application behavior changes are required.
 - keep completed external acceptance evidence separate from infrastructure
   creation.
 
+## PR 12 — Readiness-aware production routing
+
+Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 29.
+
+- update the engine pin to `1.0.0-rc.9`;
+- use the engine's explicit database-backed `/api/ready` contract for Render
+  web-service health checks;
+- return HTTP 503 when PostgreSQL is unavailable so the platform can stop
+  routing traffic to an unready instance;
+- retain `/api/health` as a process-only liveness signal;
+- validate the Render Blueprint contains the readiness health-check path;
+- preserve worker monitoring through process/job/log/SIEM controls rather than
+  inventing an HTTP worker health endpoint.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
