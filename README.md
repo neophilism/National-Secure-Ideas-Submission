@@ -6,18 +6,18 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 19 — acceptance review package assembler**
+**PR 20 — final acceptance evidence validator**
 
-SIG can now combine a verified production-promotion bundle with live deployment
-smoke evidence into a single acceptance-review package.
+SIG now has an explicit reviewer-controlled finalization step for production
+acceptance evidence.
 
-The assembler cross-checks the engine release identity, verifies the prior
-promotion checksums, attaches qualifying machine evidence to the relevant
-controls, and emits a draft acceptance-evidence file plus a review summary.
+The finalizer consumes the machine-generated acceptance draft plus a reviewer
+decision file. It requires a decision for every control and refuses to emit a
+`pass` unless the reviewer supplies a substantive evidence reference.
 
-No control is automatically changed to `pass`. Even with valid promotion and
-smoke evidence, all production gates remain pending until their complete
-external/operator evidence has been reviewed.
+Machine-collected supporting evidence is preserved but remains distinct from the
+reviewer's evidence basis. The resulting file must still pass the production
+preflight before go-live review.
 
 ## Security boundary
 
@@ -129,6 +129,7 @@ Production operators should use:
 - [Live production smoke evidence](docs/live-production-smoke.md)
 - [Automated production promotion bundle](docs/production-promotion-bundle.md)
 - [Acceptance review package](docs/acceptance-review-package.md)
+- [Final acceptance evidence review](docs/final-acceptance-evidence.md)
 
 A real production environment must pass:
 
