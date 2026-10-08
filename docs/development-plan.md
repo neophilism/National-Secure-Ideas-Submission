@@ -281,6 +281,23 @@ Stacked on the acceptance-review package.
 - keep the production preflight as the final machine enforcement layer;
 - prove in CI that an evidence-free pass is rejected.
 
+## PR 21 — Land acceptance stack and release-capable rc.9 pin
+
+SIG PRs 19 and 20 were merged into already-merged parent feature branches and
+therefore did not propagate to `main`.
+
+This direct-to-main consolidation:
+
+- lands the acceptance-review package assembler;
+- lands the explicit reviewer-controlled final acceptance validator;
+- retains the managed-PostgreSQL correction to the supply-chain evidence gate;
+- keeps all controls pending unless an authorized reviewer explicitly marks a
+  fully evidenced control pass;
+- advances the engine lock from the earlier rc.9 runtime commit to merged
+  engine PR 33, the source that contains the validated one-click release
+  workflow and public release-evidence asset handoff;
+- reruns the entire SIG validation stack against that canonical release source.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
