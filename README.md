@@ -6,7 +6,7 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 17 — automated release-to-production promotion bundle**
+**PR 18 — automated release-to-production promotion bundle**
 
 SIG can now turn the public engine rc.9 GitHub Release evidence into a verified
 deployment bundle without manually transcribing a container digest.
