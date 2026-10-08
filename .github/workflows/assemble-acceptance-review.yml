@@ -1,0 +1,109 @@
+name: Assemble production acceptance review
+
+on:
+  workflow_dispatch:
+    inputs:
+      promotion_run_id:
+        description: "Run ID from Prepare production promotion bundle"
+        required: true
+        type: string
+      smoke_run_id:
+        description: "Run ID from Production smoke evidence"
+        required: true
+        type: string
+      deployment_id:
+        description: "Deployment/change identifier"
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SIG
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Download promotion bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: sig-production-promotion-${{ inputs.promotion_run_id }}
+          path: evidence/promotion
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.promotion_run_id }}
+
+      - name: Download live smoke evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: sig-live-smoke-${{ inputs.smoke_run_id }}
+          path: evidence/smoke
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.smoke_run_id }}
+
+      - name: Verify promotion bundle checksums
+        working-directory: evidence/promotion
+        run: sha256sum --check SHA256SUMS
+
+      - name: Assemble acceptance review
+        run: |
+          node scripts/assemble-acceptance-review.mjs \
+            --promotion evidence/promotion/production-promotion-evidence.json \
+            --smoke evidence/smoke/live-deployment-smoke.json \
+            --promotion-run-id "${{ inputs.promotion_run_id }}" \
+            --smoke-run-id "${{ inputs.smoke_run_id }}" \
+            --deployment-id "${{ inputs.deployment_id }}" \
+            --out-draft acceptance-evidence-draft.json \
+            --out-review acceptance-review.json
+
+      - name: Package supporting evidence
+        run: |
+          mkdir -p acceptance-package
+          cp acceptance-evidence-draft.json acceptance-package/
+          cp acceptance-review.json acceptance-package/
+          cp evidence/promotion/production-promotion-evidence.json acceptance-package/
+          cp evidence/promotion/release-evidence.json acceptance-package/
+          cp evidence/promotion/render.generated.yaml acceptance-package/
+          cp evidence/promotion/SHA256SUMS acceptance-package/promotion-SHA256SUMS
+          cp evidence/smoke/live-deployment-smoke.json acceptance-package/
+          (
+            cd acceptance-package
+            sha256sum \
+              acceptance-evidence-draft.json \
+              acceptance-review.json \
+              production-promotion-evidence.json \
+              release-evidence.json \
+              render.generated.yaml \
+              promotion-SHA256SUMS \
+              live-deployment-smoke.json \
+              > PACKAGE-SHA256SUMS
+          )
+
+      - name: Upload acceptance review package
+        uses: actions/upload-artifact@v4
+        with:
+          name: sig-acceptance-review-${{ github.run_id }}
+          path: acceptance-package/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Summarize acceptance review
+        run: |
+          echo "## SIG production acceptance review" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Deployment: `${{ inputs.deployment_id }}`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Promotion run: `${{ inputs.promotion_run_id }}`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Smoke run: `${{ inputs.smoke_run_id }}`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Go-live status: **not ready**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- All external acceptance gates remain pending until full evidence is supplied." >> "$GITHUB_STEP_SUMMARY"
+          echo "- Artifact: `sig-acceptance-review-${{ github.run_id }}`" >> "$GITHUB_STEP_SUMMARY"
