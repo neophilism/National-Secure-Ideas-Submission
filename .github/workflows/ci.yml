@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: neophilism/Secure-Intake-Case-Workflow-Engine
-          ref: 509b4734a5d65c9716b4a91ea34fa4b3979d9d17
+          ref: 788de83a9f00e9bb68c470838b4256fc8f932304
           path: .engine
 
       - name: Install pinned engine dependencies
