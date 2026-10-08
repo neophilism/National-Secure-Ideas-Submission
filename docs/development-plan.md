@@ -246,6 +246,58 @@ Operational prerequisite: publish engine `v1.0.0-rc.9` with its public
 - keep actual paid-resource creation and external security acceptance as
   separate deployment steps.
 
+## PR 19 — Acceptance review package assembler
+
+Stacked on the automated promotion bundle and existing live-smoke workflow.
+
+- download a prior production-promotion artifact and live-smoke artifact by
+  GitHub Actions run ID;
+- verify the promotion bundle checksums;
+- require promotion and smoke evidence to reference the same engine release;
+- attach qualifying machine evidence to the relevant control review;
+- keep every production gate in `pending` status until its full external
+  requirement is satisfied;
+- align the immutable-supply-chain control with managed PostgreSQL deployments
+  by accepting provider/resource/version identity instead of requiring a
+  nonexistent managed-database container digest;
+- emit a draft acceptance-evidence file, review summary, original supporting
+  artifacts and package checksums as one review bundle;
+- prove in CI that valid machine evidence still results in zero automatically
+  passed gates.
+
+## PR 20 — Final acceptance evidence validator
+
+Stacked on the acceptance-review package.
+
+- add an explicit reviewer-decision template covering every production control;
+- require deployment ID, exact review timestamp and reviewer identity;
+- accept only `pending` or `pass` decisions;
+- reject any `pass` without a substantive reviewer evidence reference;
+- preserve machine-generated supporting evidence while clearly separating it
+  from reviewer evidence;
+- reject missing/extra controls and deployment/schema mismatches;
+- emit the final `acceptance-evidence.json` only from explicit reviewer
+  decisions;
+- keep the production preflight as the final machine enforcement layer;
+- prove in CI that an evidence-free pass is rejected.
+
+## PR 21 — Land acceptance stack and release-capable rc.9 pin
+
+SIG PRs 19 and 20 were merged into already-merged parent feature branches and
+therefore did not propagate to `main`.
+
+This direct-to-main consolidation:
+
+- lands the acceptance-review package assembler;
+- lands the explicit reviewer-controlled final acceptance validator;
+- retains the managed-PostgreSQL correction to the supply-chain evidence gate;
+- keeps all controls pending unless an authorized reviewer explicitly marks a
+  fully evidenced control pass;
+- advances the engine lock from the earlier rc.9 runtime commit to merged
+  engine PR 33, the source that contains the validated one-click release
+  workflow and public release-evidence asset handoff;
+- reruns the entire SIG validation stack against that canonical release source.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.

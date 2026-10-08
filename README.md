@@ -6,19 +6,26 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 18 — automated release-to-production promotion bundle**
+**PR 21 — land acceptance stack and release-capable rc.9 pin**
 
-SIG can now turn the public engine rc.9 GitHub Release evidence into a verified
-deployment bundle without manually transcribing a container digest.
+PRs 19 and 20 were reviewed and merged as stacked changes, but their parent
+feature branches had already been merged into `main`. This PR lands their
+cumulative acceptance-review/finalization work directly on current SIG
+`main`.
 
-The manual **Prepare production promotion bundle** workflow downloads
-`release-evidence.json`, verifies it against `engine.lock.json`, generates
-the immutable Render Blueprint, and emits a promotion record tying the SIG
-commit, engine source commit, release tag, container digest, immutable image and
-Blueprint SHA-256 together.
+It also advances the locked rc.9 engine source to the merged engine PR 33
+commit, which is the source that will publish `v1.0.0-rc.9` through the new
+one-click validated release workflow.
 
-The resulting Actions artifact contains the release evidence, Render Blueprint,
-promotion evidence and checksums. It contains no production secret values.
+The consolidated result includes:
+
+- acceptance-review package assembly from promotion + live-smoke artifacts;
+- explicit separation of supporting machine evidence from reviewer evidence;
+- zero automatic control promotion;
+- final reviewer-decision validation;
+- rejection of evidence-free `pass` decisions;
+- release provenance aligned with the actual rc.9 source that will be tagged
+  and published.
 
 ## Security boundary
 
@@ -50,7 +57,7 @@ This preserves the source's distinction between anonymous status tracking and di
 Pinned engine:
 
 - version: `1.0.0-rc.9`
-- source commit: `788de83a9f00e9bb68c470838b4256fc8f932304`
+- source commit: `2fb452f23e5e5464db03a3ec95d36c4bc2db4fa4`
 - target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.9`
 - manifest schema: `1`
 
@@ -129,6 +136,8 @@ Production operators should use:
 - [Render production Blueprint](docs/render-production-blueprint.md)
 - [Live production smoke evidence](docs/live-production-smoke.md)
 - [Automated production promotion bundle](docs/production-promotion-bundle.md)
+- [Acceptance review package](docs/acceptance-review-package.md)
+- [Final acceptance evidence review](docs/final-acceptance-evidence.md)
 
 A real production environment must pass:
 
