@@ -6,18 +6,26 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 20 — final acceptance evidence validator**
+**PR 21 — land acceptance stack and release-capable rc.9 pin**
 
-SIG now has an explicit reviewer-controlled finalization step for production
-acceptance evidence.
+PRs 19 and 20 were reviewed and merged as stacked changes, but their parent
+feature branches had already been merged into `main`. This PR lands their
+cumulative acceptance-review/finalization work directly on current SIG
+`main`.
 
-The finalizer consumes the machine-generated acceptance draft plus a reviewer
-decision file. It requires a decision for every control and refuses to emit a
-`pass` unless the reviewer supplies a substantive evidence reference.
+It also advances the locked rc.9 engine source to the merged engine PR 33
+commit, which is the source that will publish `v1.0.0-rc.9` through the new
+one-click validated release workflow.
 
-Machine-collected supporting evidence is preserved but remains distinct from the
-reviewer's evidence basis. The resulting file must still pass the production
-preflight before go-live review.
+The consolidated result includes:
+
+- acceptance-review package assembly from promotion + live-smoke artifacts;
+- explicit separation of supporting machine evidence from reviewer evidence;
+- zero automatic control promotion;
+- final reviewer-decision validation;
+- rejection of evidence-free `pass` decisions;
+- release provenance aligned with the actual rc.9 source that will be tagged
+  and published.
 
 ## Security boundary
 
