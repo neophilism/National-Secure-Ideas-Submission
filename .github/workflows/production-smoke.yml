@@ -1,0 +1,46 @@
+name: Production smoke evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Bare HTTPS production/prod-equivalent SIG origin"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SIG configuration
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run live production smoke checks
+        run: >-
+          node scripts/verify-live-deployment.mjs
+          --base-url "${{ inputs.base_url }}"
+          --out live-deployment-smoke.json
+
+      - name: Upload smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: sig-live-smoke-${{ github.run_id }}
+          path: live-deployment-smoke.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Summarize smoke evidence
+        run: |
+          echo "## SIG live production smoke" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Base URL: `${{ inputs.base_url }}`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Evidence artifact: `sig-live-smoke-${{ github.run_id }}`" >> "$GITHUB_STEP_SUMMARY"
