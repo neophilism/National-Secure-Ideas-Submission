@@ -141,6 +141,7 @@ Production operators should use:
 - `deployment/security-acceptance.json`
 - `deployment/records-retention.json`
 - [Current provisioning status](docs/production-provisioning-status.md)
+- [Render production Blueprint](docs/render-production-blueprint.md)
 
 A real production environment must pass:
 
