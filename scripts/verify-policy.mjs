@@ -11,7 +11,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const ENGINE_COMMIT = "e7a79a84c7025a862473b21fc5f36a2c4e5673c9";
+const ENGINE_COMMIT = "3659a32ea4352a1e5d4597efcb895de833ae0441";
 
 assert(manifest.schemaVersion === 1, "manifest schemaVersion must be 1");
 assert(
@@ -20,16 +20,16 @@ assert(
 );
 assert(
   lock.engine?.sourceCommit === ENGINE_COMMIT,
-  "engine source pin must match the reviewed durable-storage/scanner engine commit",
+  "engine source pin must match the reviewed readiness-aware engine commit",
 );
 assert(
-  lock.engine?.version === "1.0.0-rc.8",
-  "engine version pin must be 1.0.0-rc.8",
+  lock.engine?.version === "1.0.0-rc.9",
+  "engine version pin must be 1.0.0-rc.9",
 );
 assert(
   lock.engine?.image ===
-    "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.8",
-  "engine image pin must be 1.0.0-rc.8",
+    "ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.9",
+  "engine image pin must be 1.0.0-rc.9",
 );
 
 const form = manifest.forms?.find(
