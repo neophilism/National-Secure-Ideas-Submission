@@ -58,8 +58,27 @@ jobs:
 
       - name: Generate and validate Render production Blueprint
         run: |
+          node -e '
+            const fs = require("fs");
+            const lock = require("./engine.lock.json").engine;
+            const repository = "ghcr.io/neophilism/secure-intake-case-workflow-engine";
+            const digest = "sha256:" + "a".repeat(64);
+            fs.writeFileSync("/tmp/release-evidence.json", JSON.stringify({
+              schemaVersion: 1,
+              engine: {
+                version: lock.version,
+                sourceCommit: lock.sourceCommit,
+                tag: "v" + lock.version
+              },
+              container: {
+                repository,
+                digest,
+                immutableRef: repository + "@" + digest
+              }
+            }));
+          '
           node scripts/generate-render-blueprint.mjs \
-            --engine-image ghcr.io/neophilism/secure-intake-case-workflow-engine@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
+            --release-evidence /tmp/release-evidence.json \
             --out deployment/render.generated.yaml
           ruby -e '
             require "yaml"
@@ -72,6 +91,7 @@ jobs:
             abort "migration hook missing" unless web["preDeployCommand"] == "npm run db:migrate"
             abort "readiness health check missing" unless web["healthCheckPath"] == "/api/ready"
             abort "images differ" unless web.dig("image", "url") == worker.dig("image", "url")
+            abort "image is not immutable" unless web.dig("image", "url").include?("@sha256:")
             db = data.fetch("databases").fetch(0)
             abort "database must block public access" unless db["ipAllowList"] == []
           '
