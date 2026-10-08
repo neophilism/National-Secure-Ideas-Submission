@@ -85,6 +85,15 @@ for (const key of [
   "AUTH_TRUST_PROXY_HEADERS",
   "DOCUMENT_MAX_BYTES",
   "PUBLIC_UPLOAD_TOTAL_MAX_BYTES",
+  "DOCUMENT_STORAGE_DRIVER",
+  "DOCUMENT_S3_ENDPOINT",
+  "DOCUMENT_S3_REGION",
+  "DOCUMENT_S3_BUCKET",
+  "DOCUMENT_S3_ACCESS_KEY_ID",
+  "DOCUMENT_S3_SECRET_ACCESS_KEY",
+  "MALWARE_SCANNER_URL",
+  "MALWARE_SCANNER_PROVIDER",
+  "MALWARE_SCANNER_TIMEOUT_MS",
   "PROTECTED_DATA_ENCRYPTION_KEY",
   "SIG_WEBHOOKS_ENABLED",
 ]) {
@@ -141,6 +150,35 @@ if (aggregateMax > 50 * 1024 * 1024) {
   fail("SIG aggregate upload limit must not exceed 50 MB");
 }
 
+if (required(env, "DOCUMENT_STORAGE_DRIVER") !== "s3") {
+  fail("Production SIG requires DOCUMENT_STORAGE_DRIVER=s3");
+}
+
+const storageUrl = new URL(required(env, "DOCUMENT_S3_ENDPOINT"));
+if (
+  storageUrl.protocol !== "https:" ||
+  storageUrl.username ||
+  storageUrl.password ||
+  storageUrl.search ||
+  storageUrl.hash
+) {
+  fail("DOCUMENT_S3_ENDPOINT must be a bare HTTPS URL");
+}
+
+const scannerUrl = new URL(required(env, "MALWARE_SCANNER_URL"));
+if (
+  scannerUrl.protocol !== "https:" ||
+  scannerUrl.username ||
+  scannerUrl.password
+) {
+  fail("MALWARE_SCANNER_URL must be HTTPS without embedded credentials");
+}
+
+const scannerTimeout = integer(env, "MALWARE_SCANNER_TIMEOUT_MS");
+if (scannerTimeout < 1000 || scannerTimeout > 600000) {
+  fail("MALWARE_SCANNER_TIMEOUT_MS must be between 1000 and 600000");
+}
+
 if (env.has("BOOTSTRAP_ADMIN_PASSWORD")) {
   fail("Production runtime env must not contain BOOTSTRAP_ADMIN_PASSWORD");
 }
@@ -180,6 +218,29 @@ if (!args.template) {
     fail(
       "POSTGRES_PASSWORD must be at least 24 URL-safe characters from the approved secrets manager",
     );
+  }
+
+  for (const key of [
+    "DOCUMENT_S3_BUCKET",
+    "DOCUMENT_S3_ACCESS_KEY_ID",
+    "DOCUMENT_S3_SECRET_ACCESS_KEY",
+    "MALWARE_SCANNER_PROVIDER",
+  ]) {
+    if (isPlaceholder(required(env, key))) {
+      fail(`${key} still contains a placeholder`);
+    }
+  }
+
+  if (
+    /example\./i.test(storageUrl.hostname) ||
+    /example\./i.test(scannerUrl.hostname)
+  ) {
+    fail("Storage and scanner endpoints must not use template example hosts");
+  }
+
+  const scannerToken = env.get("MALWARE_SCANNER_TOKEN") ?? "";
+  if (scannerToken && isPlaceholder(scannerToken)) {
+    fail("MALWARE_SCANNER_TOKEN still contains a placeholder");
   }
 
   const protectedKey = required(

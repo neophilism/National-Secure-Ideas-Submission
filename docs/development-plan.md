@@ -110,6 +110,25 @@ same Git tree, so no application behavior changes are required.
 - add a production deployment/upgrade/restore runbook;
 - validate the production acceptance template and production Compose definition in CI.
 
+## PR 9 — Production runtime enablement
+
+Deployment execution after PR 8 exposed two reusable engine gaps that prevented
+a cloud production deployment from satisfying its own acceptance contract.
+
+Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 28.
+
+- update the engine pin to `1.0.0-rc.8`;
+- require S3-compatible private object storage in production rather than a
+  shared container filesystem;
+- require an HTTPS malware-scanner endpoint/provider in production;
+- rely on automatic `document.scan` background jobs for every new document
+  version;
+- keep scan/storage failure fail-closed and quarantined;
+- update production Compose and preflight for the durable storage/scanner
+  contract;
+- record concrete provisioning attempts and external blockers without marking
+  unverified acceptance gates as passed.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.

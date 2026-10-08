@@ -4,7 +4,7 @@
 
 Do not deploy until:
 
-- engine PR 27 / rc.7 is available as a reviewed production image;
+- engine PR 28 / rc.8 is available as a reviewed production image;
 - the exact engine image digest has been recorded;
 - the PostgreSQL image digest has been reviewed;
 - `deployment/acceptance-evidence.json` is complete;
@@ -35,6 +35,8 @@ Required sensitive values include:
 
 - PostgreSQL password;
 - protected-data encryption key;
+- object-store access credentials;
+- scanner bearer token when required by the approved scanner;
 - webhook encryption key only if webhooks are explicitly enabled.
 
 Use a URL-safe PostgreSQL password because it is embedded in the internal
@@ -85,14 +87,17 @@ Confirm:
 - engine binds only to 127.0.0.1;
 - backend network is internal;
 - no bootstrap password appears;
-- image references are immutable digests.
+- image references are immutable digests;
+- production document storage is `s3`;
+- both engine and worker receive the same object-store configuration;
+- the worker receives the scanner endpoint/provider configuration.
 
 ## 6. Pre-upgrade backup
 
 Before migrations, take a coordinated encrypted backup of:
 
 - PostgreSQL;
-- the document store;
+- the S3-compatible document store/bucket;
 - protected-data encryption-key recovery material through its approved key
   custody process.
 

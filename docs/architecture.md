@@ -20,8 +20,9 @@ The upstream engine remains domain-neutral. This repository owns:
 
 ## Engine pin
 
-The application pins the exact merged rc.7 upstream source commit recorded in
-`engine.lock.json`.
+PR 9 targets the reviewed rc.8 upstream source commit recorded in
+`engine.lock.json`. After upstream PR 28 merges, the downstream pin must be
+updated to the canonical merged rc.8 commit before PR 9 merges.
 
 Development may use the reviewed rc.7 tag. Production acceptance requires the
 published engine image to be pinned by immutable SHA-256 digest, along with an
@@ -240,6 +241,27 @@ deployment and may receive identity material only after the existing protected
 identity reveal process establishes a documented need-to-know and independent
 approval. Provider purpose, authorization, and access logging belong to the
 deployment/integration design and PR 7 acceptance work.
+
+## Durable production document path
+
+SIG production now requires engine rc.8's S3-compatible document storage and
+automatic malware-scan worker.
+
+The production web process and worker share document bytes through the private
+object store rather than a container filesystem. This removes the requirement
+for a host-specific shared persistent disk and makes the document path portable
+across cloud application hosts.
+
+Each persisted document version queues a `document.scan` background job. The
+worker re-reads bytes from object storage, re-verifies SHA-256, calls the
+configured HTTPS scanner, and records the result through the existing document
+trust service.
+
+Production preflight requires the S3 driver and scanner endpoint/provider.
+Those requirements prove configuration is present; the separate acceptance
+gates still require evidence that the selected object store and scanner are
+approved, reachable through the intended egress policy, backed up, monitored,
+and tested with clean/infected/failure samples.
 
 ## Security / deployment acceptance boundary
 
