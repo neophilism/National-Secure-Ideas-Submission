@@ -298,6 +298,18 @@ This direct-to-main consolidation:
   workflow and public release-evidence asset handoff;
 - reruns the entire SIG validation stack against that canonical release source.
 
+## PR 22 — Automatic production promotion request
+
+- add a reviewed `production-promotion-request.json` containing the exact
+  locked engine release tag and immutable source commit;
+- validate the request against `engine.lock.json`;
+- trigger the existing promotion-bundle workflow automatically when the request
+  changes on `main`;
+- retain manual workflow dispatch for controlled retries;
+- reject promotion requests that drift from the locked rc.9 source;
+- use the already-published public rc.9 release evidence to generate the
+  immutable Render deployment bundle after merge.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
