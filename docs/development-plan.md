@@ -217,6 +217,17 @@ current SIG `main`:
 It also pins validation to the reviewed main-targeted engine PR 31 head that
 lands the orphaned engine PR 30 release-evidence work.
 
+## PR 16 — PR 15 post-merge rc.9 pin cleanup
+
+Engine PR 31 and SIG PR 15 are now both on their real `main` branches. SIG
+still references the reviewed PR 31 head SHA even though the merged engine
+commit has the exact same Git tree.
+
+- repin `engine.lock.json` to the canonical merged rc.9 engine commit;
+- update downstream CI and policy verification to the merged source SHA;
+- update README provenance;
+- rerun the full SIG validation suite against engine `main`.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
