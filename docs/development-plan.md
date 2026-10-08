@@ -228,7 +228,7 @@ commit has the exact same Git tree.
 - update README provenance;
 - rerun the full SIG validation suite against engine `main`.
 
-## PR 17 — Automated release-to-production promotion bundle
+## PR 18 — Automated release-to-production promotion bundle
 
 Operational prerequisite: publish engine `v1.0.0-rc.9` with its public
 `release-evidence.json` asset.
