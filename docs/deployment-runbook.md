@@ -4,7 +4,7 @@
 
 Do not deploy until:
 
-- engine PR 28 / rc.8 is available as a reviewed production image;
+- engine PR 28 / rc.9 is available as a reviewed production image;
 - the exact engine image digest has been recorded;
 - the PostgreSQL image digest has been reviewed;
 - `deployment/acceptance-evidence.json` is complete;

@@ -13,7 +13,7 @@ the rc.7 document path: cloud deployments were limited to local filesystem
 document storage, and malware-scan results had to be supplied by an external
 process rather than entering an automatic worker queue.
 
-SIG now targets engine rc.8, which adds S3-compatible durable document storage,
+SIG now targets engine rc.9, which adds S3-compatible durable document storage,
 a generic HTTPS malware-scanner adapter, and automatic `document.scan`
 background jobs for every persisted document version.
 
@@ -64,9 +64,9 @@ This preserves the source's distinction between anonymous status tracking and di
 
 Pinned engine:
 
-- version: `1.0.0-rc.8`
-- source commit: `e7a79a84c7025a862473b21fc5f36a2c4e5673c9`
-- target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.8`
+- version: `1.0.0-rc.9`
+- source commit: `757e8c6f3e55419cbf12a877b37f798527323732`
+- target image: `ghcr.io/neophilism/secure-intake-case-workflow-engine:1.0.0-rc.9`
 - manifest schema: `1`
 
 See `engine.lock.json`.

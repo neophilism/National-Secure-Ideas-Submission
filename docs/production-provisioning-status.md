@@ -71,7 +71,7 @@ No SIG production web service or worker currently exists.
 
 The connected Render automation surface can create web services but does not
 expose creation of the background-worker/persistent-disk topology required by
-the existing production runbook. Engine rc.8 removes the shared-disk requirement
+the existing production runbook. Engine rc.9 removes the shared-disk requirement
 by supporting S3-compatible storage, but a continuously running background
 worker is still required for deadline/review/scanner jobs.
 

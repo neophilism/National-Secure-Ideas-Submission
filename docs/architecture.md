@@ -20,9 +20,9 @@ The upstream engine remains domain-neutral. This repository owns:
 
 ## Engine pin
 
-PR 9 targets the reviewed rc.8 upstream source commit recorded in
+PR 9 targets the reviewed rc.9 upstream source commit recorded in
 `engine.lock.json`. After upstream PR 28 merges, the downstream pin must be
-updated to the canonical merged rc.8 commit before PR 9 merges.
+updated to the canonical merged rc.9 commit before PR 9 merges.
 
 Development may use the reviewed rc.7 tag. Production acceptance requires the
 published engine image to be pinned by immutable SHA-256 digest, along with an
@@ -244,7 +244,7 @@ deployment/integration design and PR 7 acceptance work.
 
 ## Durable production document path
 
-SIG production now requires engine rc.8's S3-compatible document storage and
+SIG production now requires engine rc.9's S3-compatible document storage and
 automatic malware-scan worker.
 
 The production web process and worker share document bytes through the private
