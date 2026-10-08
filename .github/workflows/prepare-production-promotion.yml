@@ -1,0 +1,108 @@
+name: Prepare production promotion bundle
+
+on:
+  workflow_dispatch:
+    inputs:
+      engine_tag:
+        description: "Published engine release tag"
+        required: true
+        default: "v1.0.0-rc.9"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SIG
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate requested engine tag
+        shell: bash
+        env:
+          ENGINE_TAG: ${{ inputs.engine_tag }}
+        run: |
+          set -euo pipefail
+          locked_version="$(node -p "require('./engine.lock.json').engine.version")"
+          if [ "$ENGINE_TAG" != "v$locked_version" ]; then
+            echo "Requested engine tag $ENGINE_TAG does not match locked version v$locked_version." >&2
+            exit 1
+          fi
+
+      - name: Download public engine release evidence
+        shell: bash
+        env:
+          ENGINE_TAG: ${{ inputs.engine_tag }}
+        run: |
+          set -euo pipefail
+          url="https://github.com/neophilism/Secure-Intake-Case-Workflow-Engine/releases/download/$ENGINE_TAG/release-evidence.json"
+          curl --fail --location --silent --show-error "$url" --output release-evidence.json
+          test -s release-evidence.json
+
+      - name: Generate immutable Render Blueprint
+        run: |
+          node scripts/generate-render-blueprint.mjs \
+            --release-evidence release-evidence.json \
+            --out render.generated.yaml
+
+      - name: Validate generated Blueprint
+        run: |
+          ruby -e '
+            require "yaml"
+            data = YAML.load_file("render.generated.yaml")
+            services = data.fetch("services")
+            abort "expected web and worker" unless services.map { |s| s["type"] }.sort == ["web", "worker"]
+            web = services.find { |s| s["type"] == "web" }
+            worker = services.find { |s| s["type"] == "worker" }
+            abort "worker command missing" unless worker["dockerCommand"] == "npm run worker"
+            abort "migration hook missing" unless web["preDeployCommand"] == "npm run db:migrate"
+            abort "readiness health check missing" unless web["healthCheckPath"] == "/api/ready"
+            abort "images differ" unless web.dig("image", "url") == worker.dig("image", "url")
+            abort "image is not immutable" unless web.dig("image", "url").include?("@sha256:")
+            db = data.fetch("databases").fetch(0)
+            abort "database must block public access" unless db["ipAllowList"] == []
+          '
+
+      - name: Write promotion evidence
+        run: |
+          node scripts/write-production-promotion-evidence.mjs \
+            --release-evidence release-evidence.json \
+            --blueprint render.generated.yaml \
+            --sig-commit "$GITHUB_SHA" \
+            --out production-promotion-evidence.json
+
+      - name: Write bundle checksums
+        run: |
+          sha256sum \
+            release-evidence.json \
+            render.generated.yaml \
+            production-promotion-evidence.json \
+            > SHA256SUMS
+
+      - name: Upload production promotion bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: sig-production-promotion-${{ github.run_id }}
+          path: |
+            release-evidence.json
+            render.generated.yaml
+            production-promotion-evidence.json
+            SHA256SUMS
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Summarize promotion bundle
+        run: |
+          echo "## SIG production promotion bundle" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Engine tag: `${{ inputs.engine_tag }}`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- SIG commit: `$GITHUB_SHA`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Artifact: `sig-production-promotion-${{ github.run_id }}`" >> "$GITHUB_STEP_SUMMARY"

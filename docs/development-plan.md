@@ -228,6 +228,24 @@ commit has the exact same Git tree.
 - update README provenance;
 - rerun the full SIG validation suite against engine `main`.
 
+## PR 18 — Automated release-to-production promotion bundle
+
+Operational prerequisite: publish engine `v1.0.0-rc.9` with its public
+`release-evidence.json` asset.
+
+- fetch the public engine release evidence by locked release tag;
+- verify release version, exact engine source commit, release tag, GHCR
+  repository, SHA-256 digest and immutable image reference against
+  `engine.lock.json`;
+- generate the immutable Render Blueprint from the verified release;
+- write machine-readable promotion evidence tying the SIG commit to the engine
+  source/digest and Blueprint hash;
+- generate bundle SHA-256 checksums;
+- upload the release evidence, Render Blueprint, promotion evidence and
+  checksums as one Actions artifact;
+- keep actual paid-resource creation and external security acceptance as
+  separate deployment steps.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.

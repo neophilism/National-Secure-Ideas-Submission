@@ -6,25 +6,19 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 15 — land production deployment stack on main**
+**PR 18 — automated release-to-production promotion bundle**
 
-PRs 11–14 were successfully reviewed and merged as a stacked sequence, but
-their parent feature branches had already been merged into `main`. This PR
-lands their cumulative production-enablement result directly on current SIG
-`main`.
+SIG can now turn the public engine rc.9 GitHub Release evidence into a verified
+deployment bundle without manually transcribing a container digest.
 
-The consolidated production path includes:
+The manual **Prepare production promotion bundle** workflow downloads
+`release-evidence.json`, verifies it against `engine.lock.json`, generates
+the immutable Render Blueprint, and emits a promotion record tying the SIG
+commit, engine source commit, release tag, container digest, immutable image and
+Blueprint SHA-256 together.
 
-- generated Render infrastructure for the web service, continuous worker and
-  private PostgreSQL;
-- rc.9 `/api/ready` database-backed routing health;
-- release-evidence verification before immutable container promotion;
-- a read-only live deployment smoke workflow that emits JSON evidence for
-  liveness, readiness, the public unclassified boundary, participant-login
-  availability and production security headers.
-
-Validation is pinned to the reviewed engine PR 31 head until that
-main-targeted release-evidence repair merges.
+The resulting Actions artifact contains the release evidence, Render Blueprint,
+promotion evidence and checksums. It contains no production secret values.
 
 ## Security boundary
 
@@ -134,6 +128,7 @@ Production operators should use:
 - [Current provisioning status](docs/production-provisioning-status.md)
 - [Render production Blueprint](docs/render-production-blueprint.md)
 - [Live production smoke evidence](docs/live-production-smoke.md)
+- [Automated production promotion bundle](docs/production-promotion-bundle.md)
 
 A real production environment must pass:
 
