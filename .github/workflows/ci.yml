@@ -95,3 +95,11 @@ jobs:
             db = data.fetch("databases").fetch(0)
             abort "database must block public access" unless db["ipAllowList"] == []
           '
+
+      - name: Verify live smoke harness contract
+        run: |
+          node --check scripts/verify-live-deployment.mjs
+          if node scripts/verify-live-deployment.mjs --base-url http://example.invalid; then
+            echo "Smoke harness accepted a non-HTTPS deployment URL." >&2
+            exit 1
+          fi
