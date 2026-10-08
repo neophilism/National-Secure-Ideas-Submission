@@ -129,6 +129,17 @@ Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 28.
 - record concrete provisioning attempts and external blockers without marking
   unverified acceptance gates as passed.
 
+## PR 10 — PR 9 post-merge rc.8 pin cleanup
+
+PR 9 merged immediately before upstream engine PR 28, so its reviewed rc.8
+source pin still referenced the PR head commit. The merged engine commit has
+the exact same Git tree, so no application behavior changes are required.
+
+- repin `engine.lock.json` to the canonical merged rc.8 engine commit;
+- update downstream CI to validate the merged engine commit;
+- update policy guardrails and README provenance;
+- rerun complete downstream validation against the merged rc.8 commit.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
