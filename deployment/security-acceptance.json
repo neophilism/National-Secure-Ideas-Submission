@@ -7,7 +7,7 @@
       "id": "immutable_images",
       "category": "supply_chain",
       "gate": true,
-      "requirement": "Engine and PostgreSQL production images are pinned by immutable sha256 digest."
+      "requirement": "Engine production image is pinned by immutable sha256 digest; the production database is either pinned by immutable image digest when self-managed or has its managed-service resource identity, provider, region, and database major version captured in deployment evidence."
     },
     {
       "id": "secrets_key_custody",
