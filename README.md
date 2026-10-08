@@ -6,19 +6,18 @@ This is a downstream application of the generic [Secure Intake & Case Workflow E
 
 ## Current milestone
 
-**PR 18 — automated release-to-production promotion bundle**
+**PR 19 — acceptance review package assembler**
 
-SIG can now turn the public engine rc.9 GitHub Release evidence into a verified
-deployment bundle without manually transcribing a container digest.
+SIG can now combine a verified production-promotion bundle with live deployment
+smoke evidence into a single acceptance-review package.
 
-The manual **Prepare production promotion bundle** workflow downloads
-`release-evidence.json`, verifies it against `engine.lock.json`, generates
-the immutable Render Blueprint, and emits a promotion record tying the SIG
-commit, engine source commit, release tag, container digest, immutable image and
-Blueprint SHA-256 together.
+The assembler cross-checks the engine release identity, verifies the prior
+promotion checksums, attaches qualifying machine evidence to the relevant
+controls, and emits a draft acceptance-evidence file plus a review summary.
 
-The resulting Actions artifact contains the release evidence, Render Blueprint,
-promotion evidence and checksums. It contains no production secret values.
+No control is automatically changed to `pass`. Even with valid promotion and
+smoke evidence, all production gates remain pending until their complete
+external/operator evidence has been reviewed.
 
 ## Security boundary
 
@@ -129,6 +128,7 @@ Production operators should use:
 - [Render production Blueprint](docs/render-production-blueprint.md)
 - [Live production smoke evidence](docs/live-production-smoke.md)
 - [Automated production promotion bundle](docs/production-promotion-bundle.md)
+- [Acceptance review package](docs/acceptance-review-package.md)
 
 A real production environment must pass:
 
