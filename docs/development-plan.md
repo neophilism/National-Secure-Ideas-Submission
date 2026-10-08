@@ -140,6 +140,22 @@ the exact same Git tree, so no application behavior changes are required.
 - update policy guardrails and README provenance;
 - rerun complete downstream validation against the merged rc.8 commit.
 
+## PR 11 — Render production Blueprint
+
+- generate Render infrastructure-as-code only from an immutable rc.8 engine
+  image digest;
+- provision the SIG web service, continuous background worker, and managed
+  PostgreSQL together;
+- run database migrations as the web service pre-deploy command;
+- keep PostgreSQL closed to public IP access;
+- prompt for object-store, scanner, protected-data and production-origin
+  secrets rather than committing them;
+- share the web service's secret/config values with the worker through Render
+  service references;
+- validate the generated Blueprint structure in downstream CI;
+- keep completed external acceptance evidence separate from infrastructure
+  creation.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
