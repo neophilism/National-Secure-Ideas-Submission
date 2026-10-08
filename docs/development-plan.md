@@ -140,6 +140,83 @@ the exact same Git tree, so no application behavior changes are required.
 - update policy guardrails and README provenance;
 - rerun complete downstream validation against the merged rc.8 commit.
 
+## PR 11 — Render production Blueprint
+
+- generate Render infrastructure-as-code only from an immutable rc.8 engine
+  image digest;
+- provision the SIG web service, continuous background worker, and managed
+  PostgreSQL together;
+- run database migrations as the web service pre-deploy command;
+- keep PostgreSQL closed to public IP access;
+- prompt for object-store, scanner, protected-data and production-origin
+  secrets rather than committing them;
+- share the web service's secret/config values with the worker through Render
+  service references;
+- validate the generated Blueprint structure in downstream CI;
+- keep completed external acceptance evidence separate from infrastructure
+  creation.
+
+## PR 12 — Readiness-aware production routing
+
+Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 29.
+
+- update the engine pin to `1.0.0-rc.9`;
+- use the engine's explicit database-backed `/api/ready` contract for Render
+  web-service health checks;
+- return HTTP 503 when PostgreSQL is unavailable so the platform can stop
+  routing traffic to an unready instance;
+- retain `/api/health` as a process-only liveness signal;
+- validate the Render Blueprint contains the readiness health-check path;
+- preserve worker monitoring through process/job/log/SIEM controls rather than
+  inventing an HTTP worker health endpoint.
+
+## PR 13 — Release-evidence-driven production promotion
+
+Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 30.
+
+- consume the engine release workflow's machine-readable
+  `release-evidence.json` artifact;
+- verify evidence schema, rc.9 version, exact source commit, release tag,
+  expected GHCR repository, SHA-256 digest and immutable reference against
+  `engine.lock.json`;
+- generate the Render Blueprint from the verified immutable release reference;
+- retain direct digest input only as a controlled manual/recovery path;
+- exercise the complete release-evidence-to-Blueprint promotion path in CI.
+
+## PR 14 — Live production smoke evidence
+
+- add a read-only production/prod-equivalent smoke harness;
+- verify rc.9 liveness and database-backed readiness against the deployed
+  origin;
+- verify the SIG public intake is present with its unclassified-information
+  boundary and submit control;
+- verify the participant login surface is reachable without attempting
+  authentication;
+- verify production CSP, HSTS, framing, MIME-sniffing, referrer and permissions
+  headers;
+- emit machine-readable JSON evidence on success;
+- add a manual GitHub Actions workflow that uploads the evidence artifact;
+- keep stateful workflow, scanner, MFA, backup, penetration and accessibility
+  tests as separate acceptance activities.
+
+## PR 15 — Land production deployment stack on main
+
+SIG PRs 11 through 14 were merged into their already-merged parent feature
+branches during a rapid stacked merge sequence, so GitHub recorded them as
+merged without propagating their cumulative changes to `main`.
+
+This consolidation PR lands the already-reviewed cumulative result directly on
+current SIG `main`:
+
+- generated Render web + worker + PostgreSQL Blueprint;
+- rc.9 database-backed readiness routing;
+- release-evidence-driven immutable container promotion;
+- live read-only production smoke evidence workflow;
+- associated deployment/runbook/architecture updates.
+
+It also pins validation to the reviewed main-targeted engine PR 31 head that
+lands the orphaned engine PR 30 release-evidence work.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
