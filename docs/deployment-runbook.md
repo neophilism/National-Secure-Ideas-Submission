@@ -181,7 +181,17 @@ the trusted TLS reverse proxy.
 
 ## 12. Smoke tests
 
-Using test data only:
+Run the read-only automated smoke harness first:
+
+```bash
+node scripts/verify-live-deployment.mjs \
+  --base-url https://<production-origin> \
+  --out live-deployment-smoke.json
+```
+
+Store the resulting JSON with the deployment evidence package.
+
+Then complete the stateful/manual checks below using test data only:
 
 - public intake loads over HTTPS;
 - classified-information warning/attestation is visible;

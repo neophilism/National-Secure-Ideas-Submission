@@ -183,6 +183,22 @@ Reusable upstream prerequisite: Secure Intake & Case Workflow Engine PR 30.
 - retain direct digest input only as a controlled manual/recovery path;
 - exercise the complete release-evidence-to-Blueprint promotion path in CI.
 
+## PR 14 — Live production smoke evidence
+
+- add a read-only production/prod-equivalent smoke harness;
+- verify rc.9 liveness and database-backed readiness against the deployed
+  origin;
+- verify the SIG public intake is present with its unclassified-information
+  boundary and submit control;
+- verify the participant login surface is reachable without attempting
+  authentication;
+- verify production CSP, HSTS, framing, MIME-sniffing, referrer and permissions
+  headers;
+- emit machine-readable JSON evidence on success;
+- add a manual GitHub Actions workflow that uploads the evidence artifact;
+- keep stateful workflow, scanner, MFA, backup, penetration and accessibility
+  tests as separate acceptance activities.
+
 ## Separate classified-channel program
 
 Classified submission support is not a normal application PR. It requires an authorized infrastructure/security program and an approved interface to this unclassified case-management layer.
