@@ -70,6 +70,7 @@ jobs:
             worker = services.find { |s| s["type"] == "worker" }
             abort "worker command missing" unless worker["dockerCommand"] == "npm run worker"
             abort "migration hook missing" unless web["preDeployCommand"] == "npm run db:migrate"
+            abort "readiness health check missing" unless web["healthCheckPath"] == "/api/ready"
             abort "images differ" unless web.dig("image", "url") == worker.dig("image", "url")
             db = data.fetch("databases").fetch(0)
             abort "database must block public access" unless db["ipAllowList"] == []
