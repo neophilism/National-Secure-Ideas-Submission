@@ -1,3 +1,5 @@
+> **Canonical PR work plan:** [`registry/roadmap.json`](../registry/roadmap.json). The detailed historic instructions below remain authoritative for scope, while all current planned work/PR links must be updated in the canonical registry.
+
 # National-Secure-Ideas-Submission: complete development plan and handoff
 
 **Source:** [docs/development-plan.md](../docs/development-plan.md) (existing approved project plan, preserved below without omissions).
