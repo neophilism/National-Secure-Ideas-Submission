@@ -1,0 +1,51 @@
+version: 2.1
+
+# Execute every original substantive GitHub CI run step. The strict parser
+# blocks silently dropping new workflows, actions, or shell commands.
+# GitHub release/promotion workflows remain separately authorized and gated.
+jobs:
+  authoritative-application-verification:
+    machine:
+      image: ubuntu-2404:current
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: Prepare Node 22, Python YAML and Docker Compose environment
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y python3-venv ruby git curl xz-utils
+            python3 -m venv /tmp/sig-ci-venv
+            /tmp/sig-ci-venv/bin/pip install 'PyYAML==6.0.2'
+            curl --fail --silent --show-error --location --retry 3 https://nodejs.org/dist/v22.23.3/SHASUMS256.txt -o /tmp/node-SHASUMS256.txt
+            curl --fail --silent --show-error --location --retry 3 https://nodejs.org/dist/v22.23.3/node-v22.23.3-linux-x64.tar.xz -o /tmp/node-v22.23.3-linux-x64.tar.xz
+            ( cd /tmp && grep ' node-v22.23.3-linux-x64.tar.xz$' node-SHASUMS256.txt | sha256sum --check )
+            mkdir -p "$HOME/node"
+            tar -xJf /tmp/node-v22.23.3-linux-x64.tar.xz -C "$HOME/node" --strip-components=1
+            echo 'export PATH="$HOME/node/bin:$PATH"' >> "$BASH_ENV"
+            docker compose version
+      - run:
+          name: Clone exact pinned Secure Intake engine (public source)
+          command: |
+            git clone https://github.com/neophilism/Secure-Intake-Case-Workflow-Engine.git .engine
+            git -C .engine checkout --detach 2fb452f23e5e5464db03a3ec95d36c4bc2db4fa4
+            test "$(git -C .engine rev-parse HEAD)" = 2fb452f23e5e5464db03a3ec95d36c4bc2db4fa4
+      - run:
+          name: Execute every current GitHub application CI run step, unabridged
+          command: /tmp/sig-ci-venv/bin/python scripts/run_github_ci_locally.py
+
+  security-status-record:
+    docker:
+      - image: cimg/python:3.12
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Check E2EESA status record integrity, not security certification
+          command: python3 scripts/validate_e2eesa_status.py
+
+workflows:
+  source-and-policy-checks:
+    jobs:
+      - authoritative-application-verification
+      - security-status-record
