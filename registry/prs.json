@@ -1,9 +1,17 @@
 {
-  "schemaVersion": 1,
   "repository": "neophilism/National-Secure-Ideas-Submission",
-  "roadmapVersion": 1,
+  "title": "National-Secure-Ideas-Submission",
   "planVerified": true,
   "plannedPrCount": 21,
+  "sourceFiles": [
+    "docs/DEVELOPMENT_PLAN.md"
+  ],
+  "sourceNumberingGaps": [
+    17
+  ],
+  "scopeNote": "The plan contains no heading for these ordinal labels; no work items were fabricated to fill numbering gaps.",
+  "schemaVersion": 1,
+  "roadmapVersion": 1,
   "observedAt": "2026-10-11T17:39:51.496Z",
   "units": [
     {
@@ -13,7 +21,10 @@
       "prs": [
         1
       ],
-      "mappingEvidence": "Verified merged GitHub PR #1; directly corresponds to named roadmap unit NSI-001"
+      "mappingEvidence": "Verified merged GitHub PR #1; directly corresponds to named roadmap unit NSI-001",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-002",
@@ -22,7 +33,10 @@
       "prs": [
         2
       ],
-      "mappingEvidence": "Verified merged GitHub PR #2; directly corresponds to named roadmap unit NSI-002"
+      "mappingEvidence": "Verified merged GitHub PR #2; directly corresponds to named roadmap unit NSI-002",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-003",
@@ -31,7 +45,10 @@
       "prs": [
         3
       ],
-      "mappingEvidence": "Verified merged GitHub PR #3; directly corresponds to named roadmap unit NSI-003"
+      "mappingEvidence": "Verified merged GitHub PR #3; directly corresponds to named roadmap unit NSI-003",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-004",
@@ -40,7 +57,10 @@
       "prs": [
         4
       ],
-      "mappingEvidence": "Verified merged GitHub PR #4; directly corresponds to named roadmap unit NSI-004"
+      "mappingEvidence": "Verified merged GitHub PR #4; directly corresponds to named roadmap unit NSI-004",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-005",
@@ -49,7 +69,10 @@
       "prs": [
         5
       ],
-      "mappingEvidence": "Verified merged GitHub PR #5; directly corresponds to named roadmap unit NSI-005"
+      "mappingEvidence": "Verified merged GitHub PR #5; directly corresponds to named roadmap unit NSI-005",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-006",
@@ -58,7 +81,10 @@
       "prs": [
         6
       ],
-      "mappingEvidence": "Verified merged GitHub PR #6; directly corresponds to named roadmap unit NSI-006"
+      "mappingEvidence": "Verified merged GitHub PR #6; directly corresponds to named roadmap unit NSI-006",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-007",
@@ -67,7 +93,10 @@
       "prs": [
         7
       ],
-      "mappingEvidence": "Verified merged GitHub PR #7; directly corresponds to named roadmap unit NSI-007"
+      "mappingEvidence": "Verified merged GitHub PR #7; directly corresponds to named roadmap unit NSI-007",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-008",
@@ -76,7 +105,10 @@
       "prs": [
         8
       ],
-      "mappingEvidence": "Verified merged GitHub PR #8; directly corresponds to named roadmap unit NSI-008"
+      "mappingEvidence": "Verified merged GitHub PR #8; directly corresponds to named roadmap unit NSI-008",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-009",
@@ -85,7 +117,10 @@
       "prs": [
         9
       ],
-      "mappingEvidence": "Verified merged GitHub PR #9; directly corresponds to named roadmap unit NSI-009"
+      "mappingEvidence": "Verified merged GitHub PR #9; directly corresponds to named roadmap unit NSI-009",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-010",
@@ -94,7 +129,10 @@
       "prs": [
         10
       ],
-      "mappingEvidence": "Verified merged GitHub PR #10; directly corresponds to named roadmap unit NSI-010"
+      "mappingEvidence": "Verified merged GitHub PR #10; directly corresponds to named roadmap unit NSI-010",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-011",
@@ -103,7 +141,10 @@
       "prs": [
         11
       ],
-      "mappingEvidence": "Verified merged GitHub PR #11; directly corresponds to named roadmap unit NSI-011"
+      "mappingEvidence": "Verified merged GitHub PR #11; directly corresponds to named roadmap unit NSI-011",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-012",
@@ -112,7 +153,10 @@
       "prs": [
         12
       ],
-      "mappingEvidence": "Verified merged GitHub PR #12; directly corresponds to named roadmap unit NSI-012"
+      "mappingEvidence": "Verified merged GitHub PR #12; directly corresponds to named roadmap unit NSI-012",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-013",
@@ -121,7 +165,10 @@
       "prs": [
         13
       ],
-      "mappingEvidence": "Verified merged GitHub PR #13; directly corresponds to named roadmap unit NSI-013"
+      "mappingEvidence": "Verified merged GitHub PR #13; directly corresponds to named roadmap unit NSI-013",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-014",
@@ -130,7 +177,10 @@
       "prs": [
         14
       ],
-      "mappingEvidence": "Verified merged GitHub PR #14; directly corresponds to named roadmap unit NSI-014"
+      "mappingEvidence": "Verified merged GitHub PR #14; directly corresponds to named roadmap unit NSI-014",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-015",
@@ -139,7 +189,10 @@
       "prs": [
         15
       ],
-      "mappingEvidence": "Verified merged GitHub PR #15; directly corresponds to named roadmap unit NSI-015"
+      "mappingEvidence": "Verified merged GitHub PR #15; directly corresponds to named roadmap unit NSI-015",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-016",
@@ -148,7 +201,10 @@
       "prs": [
         16
       ],
-      "mappingEvidence": "Verified merged GitHub PR #16; directly corresponds to named roadmap unit NSI-016"
+      "mappingEvidence": "Verified merged GitHub PR #16; directly corresponds to named roadmap unit NSI-016",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-018",
@@ -157,7 +213,10 @@
       "prs": [
         18
       ],
-      "mappingEvidence": "Verified merged GitHub PR #18; directly corresponds to named roadmap unit NSI-018"
+      "mappingEvidence": "Verified merged GitHub PR #18; directly corresponds to named roadmap unit NSI-018",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-019",
@@ -166,7 +225,10 @@
       "prs": [
         19
       ],
-      "mappingEvidence": "Verified merged GitHub PR #19; directly corresponds to named roadmap unit NSI-019"
+      "mappingEvidence": "Verified merged GitHub PR #19; directly corresponds to named roadmap unit NSI-019",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-020",
@@ -175,7 +237,10 @@
       "prs": [
         20
       ],
-      "mappingEvidence": "Verified merged GitHub PR #20; directly corresponds to named roadmap unit NSI-020"
+      "mappingEvidence": "Verified merged GitHub PR #20; directly corresponds to named roadmap unit NSI-020",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-021",
@@ -184,7 +249,10 @@
       "prs": [
         21
       ],
-      "mappingEvidence": "Verified merged GitHub PR #21; directly corresponds to named roadmap unit NSI-021"
+      "mappingEvidence": "Verified merged GitHub PR #21; directly corresponds to named roadmap unit NSI-021",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     },
     {
       "id": "NSI-022",
@@ -193,7 +261,10 @@
       "prs": [
         22
       ],
-      "mappingEvidence": "Verified merged GitHub PR #22; directly corresponds to named roadmap unit NSI-022"
+      "mappingEvidence": "Verified merged GitHub PR #22; directly corresponds to named roadmap unit NSI-022",
+      "dependsOn": [],
+      "externalDependencies": [],
+      "externalPrerequisites": []
     }
   ],
   "pullRequests": [
