@@ -10,3 +10,8 @@ The owner explicitly directs all projects to continue implementation, testing, m
 - Continue dependency-ready work and chain PRs. Do not ask the owner again to waive the human-review prerequisite.
 
 # Repository agent instructions
+
+
+## Owner upstream-first requirement — 18 October 2026
+
+Before treating downstream implementation or release work as eligible, satisfy its source-owned Secure Intake prerequisites, including SI-42 stable release. The canonical registry preserves actual historical merged PR acceptance and declares runtime/source pins separately. Do not infer production completion from local PR totals or fabricate upstream completion. Preparatory tests can run while missing prerequisites are repaired upstream; continue independent eligible work. Run the dependency contract validator and negative tests, and preserve the prerelease production guard.
