@@ -1,4 +1,5 @@
 import { readFileSync, statSync } from "node:fs";
+import {verifyDependencyContract} from "./verify-dependency-contract.mjs";
 import { resolve } from "node:path";
 
 function fail(message) {
@@ -67,6 +68,7 @@ function isPlaceholder(value) {
 }
 
 const args = parseArgs(process.argv.slice(2));
+verifyDependencyContract(JSON.parse(readFileSync(new URL("../registry/prs.json",import.meta.url),"utf8")),JSON.parse(readFileSync(new URL("../engine.lock.json",import.meta.url),"utf8")),{production:!args.template});
 const envPath = resolve(args.envPath);
 const evidencePath = resolve(args.evidencePath);
 const env = parseEnv(envPath);
