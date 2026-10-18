@@ -21,6 +21,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Verify upstream-first source dependency contract
+        run: node --test tests/dependency-contract.test.mjs && node scripts/verify-dependency-contract.mjs
+
       - name: Verify downstream policy guardrails
         run: node scripts/verify-policy.mjs
 
